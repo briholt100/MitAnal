@@ -1,0 +1,20 @@
+setwd("I:\\My Data Sources\\mooc")
+wine<-read.csv("wine.csv")
+str(wine)
+summary(wine)
+model1<-lm(wine$Price~wine$AGST,data=wine)
+summary(model1)
+plot(model1)
+model1$residuals
+SSE<-sum(model1$residuals^2)
+model2<-lm(wine$Price~wine$AGST+wine$HarvestRain,data=wine)
+summary(model2)
+SSE<-sum(model2$residuals^2)
+model3<-lm(wine$Price~AGST+HarvestRain+WinterRain+
+             Age+FrancePop,data=wine)
+summary(model3)
+SSE<-sum(model3$residuals^2)
+
+model4<-lm(wine$Price~HarvestRain+WinterRain,data=wine)
+summary(model4)
+SSE<-sum(model4$residuals^2)
