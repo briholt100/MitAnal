@@ -40,4 +40,22 @@ class(predictTest)
 SSE=sum((wine_test$Price - predictTest)^2) 
 SST =sum((wine_test$Price - mean(wine$Price))^2)  #the mean comes from the baseline model
 
-1-SSE/SST
+1-SSE/SST  # this is R^2 
+
+
+
+base<-read.csv("baseball.csv")
+str(base)
+moneyball<-subset(base,Year<2002)
+str(moneyball)
+moneyball$rd<-(moneyball$RS-moneyball$RA)
+wins<-lm(W~rd,data=moneyball)
+summary(wins)
+model<-lm(RS~OBP+SLG, data=base)
+summary(model)
+
+
+teamRank <- c(1,2,3,3,4,4,4,4,5,5)
+wins2012<-c(94,88,95,88,93,94,98,97,93,94)
+wins2013<-c(97,97,92,93,92,96,94,96,92,90)
+cor(teamRank,wins2012)
