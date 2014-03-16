@@ -4,6 +4,45 @@ home<-getwd()
 setwd(paste0(home, "/MitAnal"))
 setwd(school)
 
+#CPS
+##########
+getwd()
+CPS<-read.csv("CPSData.csv")
+MetroAreaMap<-read.csv("MetroAreaCodes.csv")
+CountryMap<-read.csv("CountryCodes.csv")
+str(CountryMap)
+CPS = merge(CPS, MetroAreaMap, by.x="MetroAreaCode", by.y="Code", all.x=TRUE)
+str(CPS)
+summary(CPS)
+str(read.csv("CPSData.csv"))
+
+sort(table(CPS$MetroArea))
+
+sort(tapply(CPS$Hispanic,CPS$MetroArea,mean))
+
+tt<-sort(tapply(CPS$Race =="Asian",CPS$MetroArea,mean))
+
+tt[tt>.19]
+
+sort(tapply(CPS$Education == "No high school diploma", CPS$MetroArea, mean,na.rm=T))
+
+
+CPS = merge(CPS, CountryMap, by.x="CountryOfBirthCode", by.y="Code", all.x=TRUE)
+
+summary(CPS)
+sort(tapply(CPS$Country))
+
+
+sort(tapply(CPS$MetroArea == "New York-Northern New Jersey-Long Island, NY-NJ-PA", CPS$Country == "United States", mean,na.rm=T))
+
+
+(table(CPS$MetroArea,CPS$Country == "Somalia"))
+
+data(state)
+
+statedata = cbind(data.frame(state.x77), state.abb, state.area, state.center,  state.division, state.name, state.region)
+
+
 
 #
 #Wine
