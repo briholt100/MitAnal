@@ -263,5 +263,19 @@ RMSE<-sqrt(SSE/nrow(FluTest))
 library(zoo)
 FluTest<-read.csv("./data/FluTest.csv")
 FluTrain<-read.csv("./data/FluTrain.csv")
+
 ILILag2 = lag(zoo(FluTrain$ILI), -2, na.pad=TRUE)
 FluTrain$ILILag2 = coredata(ILILag2)
+summary(FluTrain)
+plot(log(FluTrain$ILILag2),log(FluTrain$ILI))
+
+FluTrend2<-lm(log(ILI)~Queries+ILILag2,data=FluTrain)
+summary(FluTrend2)
+
+SSE<-sum((FluTrend2$residuals)^2)
+SST
+RMSE<-sqrt(SSE/nrow(pisaTest))
+
+mean(pisaTrain$readingScore)  #predicted test score using pisaTrain (after changing values for raceeth)
+SST =sum((FluTrend2$ILI - mean(FluTrain$ILI))^2)  #the mean comes from the baseline model
+1-SSE/SST
