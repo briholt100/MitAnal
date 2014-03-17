@@ -225,3 +225,29 @@ RMSE<-sqrt(SSE/nrow(pisaTest))
 mean(pisaTrain$readingScore)  #predicted test score using pisaTrain (after changing values for raceeth)
 SST<-sum((mean(pisaTrain$readingScore)-pisaTest$readingScore)^2)
 1-SSE/SST
+
+#############
+##FluTrain
+
+FluTrain<-read.csv("FluTrain.csv")
+str(FluTrain)
+head(FluTrain$Week)
+FluTrain$Week<-as.Date(FluTrain$Week)
+table1<-tapply(FluTrain$ILI,FluTrain$Week,sum)
+which.max(subset(table1,FluTrain$Week<"2010-01-01"))
+
+table2<-tapply(FluTrain$Queries,FluTrain$Week,sum)
+table2<-(subset(table2,FluTrain$Week<"2010-01-01"))
+which.max(table2)
+FluTrain[FluTrain$Week=="2010-10-17",]
+
+hist(FluTrain$ILI)
+plot(log(FluTrain$ILI),FluTrain$Que)
+
+FluTrend1<-lm(log(FluTrain$ILI)~FluTrain$Queries)
+summary(FluTrend1)
+
+cor(log(FluTrain$ILI),FluTrain$Que)^2
+
+FluTest<-read.csv("FluTest.csv")
+PredTest1 = exp(predict(FluTrend1, newdata=FluTest))
