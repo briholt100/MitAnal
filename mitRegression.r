@@ -272,7 +272,7 @@ plot(log(FluTrain$ILILag2),log(FluTrain$ILI))
 FluTrend2<-lm(log(ILI)~Queries+log(ILILag2),data=FluTrain)
 summary(FluTrend2)
 
-SSE<-sum((FluTrend2$residuals)^2)
+
 
 ILILag2 = lag(zoo(FluTest$ILI), -2, na.pad=TRUE)
 FluTest$ILILag2 = coredata(ILILag2)
@@ -280,4 +280,13 @@ summary(FluTest)
 
 #must fill in first two data sets given teh time series lag
 head(FluTest)
-FluTest$ILILag2[2] <- FluTrain$ILILag2[417]
+FluTest$ILILag2[1] <- FluTrain$ILI[416]
+FluTest$ILILag2[2] <- FluTrain$ILI[417]
+
+
+
+PredTest2 = exp(predict(FluTrend2, newdata=FluTest))
+SSE<-sum((FluTrend2$residuals)^2)
+SSE<-sum((PredTest1-FluTest$ILI)^2)
+SST
+RMSE<-sqrt(SSE/nrow(FluTest))
