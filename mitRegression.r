@@ -274,3 +274,10 @@ summary(FluTrend2)
 
 SSE<-sum((FluTrend2$residuals)^2)
 
+ILILag2 = lag(zoo(FluTest$ILI), -2, na.pad=TRUE)
+FluTest$ILILag2 = coredata(ILILag2)
+summary(FluTest)
+
+#must fill in first two data sets given teh time series lag
+head(FluTest)
+FluTest$ILILag2[2] <- FluTrain$ILILag2[417]
