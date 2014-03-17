@@ -1,7 +1,7 @@
 getwd()
 school<-"I:/My Data Sources/mooc/MitAnalytic"
 home<-getwd()
-setwd(paste0(home, "/MitAnal"))
+setwd(paste0(home, "/mooc/MitAnal"))
 setwd(school)
 
 #CPS
