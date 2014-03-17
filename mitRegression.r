@@ -259,3 +259,9 @@ PredTest1[grep("2012-03-11",FluTest$Week)] #finds record of march 11, 2012 in fl
 SSE<-sum((PredTest1-FluTest$ILI)^2)
 SST
 RMSE<-sqrt(SSE/nrow(FluTest))
+
+library(zoo)
+FluTest<-read.csv("./data/FluTest.csv")
+FluTrain<-read.csv("./data/FluTrain.csv")
+ILILag2 = lag(zoo(FluTrain$ILI), -2, na.pad=TRUE)
+FluTrain$ILILag2 = coredata(ILILag2)
