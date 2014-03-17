@@ -124,9 +124,6 @@ nba$PTSdiff <- (nba$PTS-nba$oppPTS)
 winsReg<-lm(W~PTSdiff,data=nba)
 summary(winsReg)
 
-
-
-
 pointsReg<-lm(PTS~X2PA+X3PA+FTA+AST+ORB+DRB+TOV+STL+BLK,data=nba)
 summary(pointsReg)
 SSE<-sum(pointsReg$residuals^2)
@@ -138,9 +135,6 @@ summary(pointsReg4)
 nba_test<-read.csv("NBA_test.csv")
 
 PointsPredictions<-predict(pointsReg4,newdata=nba_test)
-
-
-
 
 
 ##2nd week homework
@@ -197,3 +191,37 @@ SSE<-sum((tempPredict-climate_test$Temp)^2)
 SST<-sum((mean(climate_train$Temp)-climate_test$Temp)^2)
 1-(SSE/SST)
 
+######
+#PISA
+######
+getwd()
+home<-getwd()
+setwd(paste0(home, "/MOOC/mitanal/data"))
+
+pisaTrain<-read.csv("pisa2009train.csv")
+pisaTest<-read.csv("pisa2009test.csv")
+str(pisaTrain)
+str(pisaTest)
+tapply(pisaTrain$readingS,pisaTrain$male,mean)
+summary(pisaTrain)
+pisaTrain <- na.omit(pisaTrain)
+
+pisaTest <- na.omit(pisaTest)
+pisaTrain$raceeth = relevel(pisaTrain$raceeth, "White")
+pisaTest$raceeth = relevel(pisaTest$raceeth, "White")
+
+lmScore<-lm(readingScore~.,data=pisaTrain)
+summary(lmScore)
+
+SSE<-sum(lmScore$residuals^2)
+RMSE<-sqrt(SSE/nrow(pisaTrain))
+
+predTest<-predict(lmScore, newdata=pisaTest)
+summary(predTest)
+SSE<-sum((predTest-pisaTest$readingScore)^2)
+SST
+RMSE<-sqrt(SSE/nrow(pisaTest))
+
+mean(pisaTrain$readingScore)  #predicted test score using pisaTrain (after changing values for raceeth)
+SST<-sum((mean(pisaTrain$readingScore)-pisaTest$readingScore)^2)
+1-SSE/SST
