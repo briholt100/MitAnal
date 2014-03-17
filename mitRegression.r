@@ -229,7 +229,7 @@ SST<-sum((mean(pisaTrain$readingScore)-pisaTest$readingScore)^2)
 #############
 ##FluTrain
 
-FluTrain<-read.csv("FluTrain.csv")
+FluTrain<-read.csv("./data/FluTrain.csv")
 str(FluTrain)
 head(FluTrain$Week)
 FluTrain$Week<-as.Date(FluTrain$Week)
@@ -244,10 +244,12 @@ FluTrain[FluTrain$Week=="2010-10-17",]
 hist(FluTrain$ILI)
 plot(log(FluTrain$ILI),FluTrain$Que)
 
-FluTrend1<-lm(log(FluTrain$ILI)~FluTrain$Queries)
+FluTrend1<-lm(log(ILI)~Queries,data=FluTrain)
 summary(FluTrend1)
 
 cor(log(FluTrain$ILI),FluTrain$Que)^2
 
-FluTest<-read.csv("FluTest.csv")
+FluTest<-read.csv("./data/FluTest.csv")
 PredTest1 = exp(predict(FluTrend1, newdata=FluTest))
+PredTest1[grep("2012-03-11",FluTest$Week)] #finds record of march 11, 2012 in fluTest, then pulls our prediction
+
