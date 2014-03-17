@@ -252,4 +252,10 @@ cor(log(FluTrain$ILI),FluTrain$Que)^2
 FluTest<-read.csv("./data/FluTest.csv")
 PredTest1 = exp(predict(FluTrend1, newdata=FluTest))
 PredTest1[grep("2012-03-11",FluTest$Week)] #finds record of march 11, 2012 in fluTest, then pulls our prediction
+#Observed ILI compared to estimated:
+(FluTest$ILI[11]-PredTest1[11])/FluTest$ILI[11]
 
+
+SSE<-sum((PredTest1-FluTest$ILI)^2)
+SST
+RMSE<-sqrt(SSE/nrow(FluTest))
