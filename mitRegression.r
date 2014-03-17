@@ -273,10 +273,4 @@ FluTrend2<-lm(log(ILI)~Queries+log(ILILag2),data=FluTrain)
 summary(FluTrend2)
 
 SSE<-sum((FluTrend2$residuals)^2)
-SST
-RMSE<-sqrt(SSE/nrow(pisaTest))
-
-mean(dataTrain$DV)  #predicted test score using pisaTrain (after changing values for raceeth)
-SST =sum((FluTrend2$ILI - mean(FluTrend1$residuals))^2)  #the mean comes from the baseline model
-1-SSE/SST
 
