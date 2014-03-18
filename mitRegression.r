@@ -288,3 +288,16 @@ SSE<-sum((FluTrend2$residuals)^2)
 SSE<-sum((PredTest2-FluTest$ILI)^2)
 SST
 RMSE<-sqrt(SSE/nrow(FluTest))
+
+
+###
+#week3
+######
+
+(-1.5+(3*1)+((-.5)*5))
+exp(x)  #equal to e^x
+#p(y=1)
+1/(1+exp(-(-1.5+(3*1)+((-.5)*5))))
+log(0.2689414)
+1-0.2689414
+0.2689414/0.7310586
