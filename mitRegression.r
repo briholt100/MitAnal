@@ -3,7 +3,7 @@ school<-"I:/My Data Sources/mooc/MitAnalytic"
 home<-getwd()
 setwd(paste0(home, "/mooc/MitAnal"))
 setwd(school)
-
+dir()
 #CPS
 ##########
 getwd()
@@ -301,3 +301,11 @@ exp(x)  #equal to e^x
 log(0.2689414)
 1-0.2689414
 0.2689414/0.7310586
+
+quality<-read.csv("./data/quality.csv")
+str(quality)
+
+model<-lm(PoorCare~.,data=quality)
+summary(model)
+model_step<-step(model)
+summary(model_step)
