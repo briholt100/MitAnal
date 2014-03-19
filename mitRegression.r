@@ -331,4 +331,7 @@ abline(v=mean(predictTrain[qualityTrain$PoorCare==1]),col="red")
 tapply (predictTrain,qualityTrain$PoorCare,mean)
 par(mfrow=c(1,1))
 
+PoorCareLog<-glm(PoorCare~StartedOnCombination+ProviderCount,data=qualityTrain,family=binomial)
+summary(PoorCareLog)
+
 
