@@ -317,4 +317,18 @@ split
 qualityTrain<-subset(quality,split==T)
 qualityTest<-subset(quality,split==F)
 nrow(qualityTest)
-qualityLog<-glm(PoorCare~OfficeVisits+Narcotics,data=quality,family=binomial)
+QualityLog<-glm(PoorCare~OfficeVisits+Narcotics,data=qualityTrain,family=binomial)
+summary(QualityLog)
+
+
+predictTrain<-predict(QualityLog,type="response") #response makes probability
+summary(predictTrain)
+
+tapply (predictTrain,qualityTrain$PoorCare,mean)
+par(mfrow=c(1,2))
+tapply (predictTrain,qualityTrain$PoorCare,hist)
+abline(v=mean(predictTrain[qualityTrain$PoorCare==1]),col="red")
+tapply (predictTrain,qualityTrain$PoorCare,mean)
+par(mfrow=c(1,1))
+
+
