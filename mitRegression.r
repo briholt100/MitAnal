@@ -334,4 +334,5 @@ par(mfrow=c(1,1))
 PoorCareLog<-glm(PoorCare~StartedOnCombination+ProviderCount,data=qualityTrain,family=binomial)
 summary(PoorCareLog)
 
-
+install.packages("ROCR")
+library(ROCR)
