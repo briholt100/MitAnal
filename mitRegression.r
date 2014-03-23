@@ -336,3 +336,6 @@ summary(PoorCareLog)
 
 install.packages("ROCR")
 library(ROCR)
+ROCRpred<-prediction(predictTrain,qualityTrain$PoorCare)
+ROCRperf<-performance(ROCRpred, "tpr","fpr")
+plot(ROCRperf,colorize =T)
