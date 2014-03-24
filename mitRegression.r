@@ -408,7 +408,7 @@ cor(SongsTrain$loud,SongsTrain$ener)
 
 SongsLog2<- glm(Top10 ~ . - loudness, data=SongsTrain, family=binomial) #keep energy, del loudness
 summary(SongsLog2)
-SongsLog3<- glm(Top10 ~ . - energy, data=SongsTrain, family=binomial)#keep loudness, del energy
+SongsLog3<- glm(Top10 ~ . -c(energy), data=SongsTrain, family=binomial)#keep loudness, del energy
 summary(SongsLog3)
 
 predictTestSongs<-predict(SongsLog3,newdata=SongsTest, type="response")
@@ -421,3 +421,21 @@ table(SongsTest$Top10)
 baserate<-1060/(6141+1060)  #  == "baserate"
 table(SongsTest$Top10,predictTestSongs>=baserate)
 (91+12)/(223+47+12+91)
+
+SongsTest<-subset(songs,songs$year==2010)
+SongsTest = SongsTest[ , !(names(SongsTest) %in% nonvars) ]
+str(SongsTest)
+predictTestSongs2010<-predict(SongsLog3,newdata=SongsTest, type="response")
+table(SongsTest$Top10,predictTestSongs>=.45)
+(309+19)/(309+5+40+19)
+#Sensistivity
+19/(40+19)
+#specificity
+309/(309+5)
+
+
+#problem set 2 week 3
+
+base<-read.csv("./data/baseball.csv")
+str(base)
+table(base$Year)
