@@ -1,8 +1,10 @@
 getwd()
 school<-"I:/My Data Sources/mooc/MitAnalytic"
+setwd(school)
 home<-getwd()
 setwd(paste0(home, "/mooc/MitAnal"))
-setwd(school)
+dater<-getwd()
+setwd(paste0(dater, "/MitAnal"))
 dir()
 #CPS
 ##########
@@ -396,4 +398,9 @@ songs[which.max(songs$tempo),]
 SongsTrain<-subset(songs,songs$year<=2009)
 SongsTest<-subset(songs,songs$year>2009)
 nrow(SongsTrain)
+nonvars = c("year", "songtitle", "artistname", "songID", "artistID")
+SongsTrain = SongsTrain[ , !(names(SongsTrain) %in% nonvars) ]
+SongsTest = SongsTest[ , !(names(SongsTest) %in% nonvars) ]
 model1<-glm(Top10~.,data=SongsTrain,family="binomial")
+summary(model1)
+
