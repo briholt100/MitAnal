@@ -1,3 +1,4 @@
+getwd()
 # Week 3, Recitation
 
 # Video 2
