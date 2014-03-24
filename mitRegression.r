@@ -508,3 +508,26 @@ split = sample.split(parole$violator, SplitRatio = 0.7)
  train = subset(parole, split == TRUE)
 
  test = subset(parole, split == FALSE)
+
+str(train)
+str(test)
+202/473
+modelViolate<-glm(violator~.,data=train,family=binomial)
+summary(modelViolate)
+exp(.154383)
+modelViolate$coef
+case1<-data.frame(1,1,50,1,3,12,0,2,0)
+colnames(case1)<-colnames(parole)
+case1$state<-as.factor(case1$state)
+case1$crime<-as.factor(case1$crime)
+predict(modelViolate,newdata=case1,type="response")
+predictVio<-predict(modelViolate,newdata=test,type="response")  
+summary(predictVio)
+sort(table(predictVio))
+
+table(test$violator,predictVio>=.5)
+
+#Sensistivity
+12/23
+#specificity
+167/(167+12)
