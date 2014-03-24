@@ -382,3 +382,12 @@ as.numeric(performance(ROCRpred,"auc")@y.values)
 #recitation and predicting elections
 #see script week3_recitation.r
 
+#week 3 homework
+
+songs<-read.csv("./data/songs.csv")
+str(songs)
+table(songs$Top10,songs$artistname=="Michael Jackson")
+songs$songtitle
+subset(songs[,c(1,2,39)],songs$artistname=="Michael Jackson")
+table(songs$timesignature)
+songs[which.max(songs$tempo),]
