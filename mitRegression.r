@@ -346,3 +346,9 @@ predictTest = predict(QualityLog, type="response", newdata=qualityTest)
 ROCRpredTest = prediction(predictTest, qualityTest$PoorCare)
 
 auc = as.numeric(performance(ROCRpredTest, "auc")@y.values)
+
+#####
+#framingham study
+
+framingham<-read.csv("./data/framingham.csv")
+str(framingham)
