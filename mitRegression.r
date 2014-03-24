@@ -354,6 +354,7 @@ auc = as.numeric(performance(ROCRpredTest, "auc")@y.values)
 
 framingham<-read.csv("./data/framingham.csv")
 str(framingham)
+install.packages("caTools")
 library(caTools)
 set.seed(1000)
 split<-sample.split(framingham$Ten,SplitRatio = .65)
@@ -405,5 +406,18 @@ model1<-glm(Top10~.,data=SongsTrain,family="binomial")
 summary(model1)
 cor(SongsTrain$loud,SongsTrain$ener)
 
-model2<-glm(Top10~.,data=SongsTrain,family="binomial") #keep energy, del loudness
-model3<-glm(Top10~.,data=SongsTrain,family="binomial") #keep loudness, del energy
+SongsLog2<- glm(Top10 ~ . - loudness, data=SongsTrain, family=binomial) #keep energy, del loudness
+summary(SongsLog2)
+SongsLog3<- glm(Top10 ~ . - energy, data=SongsTrain, family=binomial)#keep loudness, del energy
+summary(SongsLog3)
+
+predictTestSongs<-predict(SongsLog3,newdata=SongsTest, type="response")
+summary(predictTestSongs)
+table(SongsTest$Top10[SongsTest$year == "2010"],predictTestSongs>=.45)
+#overall accuracy is truNeg +TruePos / total N
+(309+19)/(309+5+40+19)
+#baseline model, looking at base rate of top 10?
+table(SongsTest$Top10)
+baserate<-1060/(6141+1060)  #  == "baserate"
+table(SongsTest$Top10,predictTestSongs>=baserate)
+(91+12)/(223+47+12+91)
