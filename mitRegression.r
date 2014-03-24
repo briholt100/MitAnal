@@ -403,4 +403,7 @@ SongsTrain = SongsTrain[ , !(names(SongsTrain) %in% nonvars) ]
 SongsTest = SongsTest[ , !(names(SongsTest) %in% nonvars) ]
 model1<-glm(Top10~.,data=SongsTrain,family="binomial")
 summary(model1)
+cor(SongsTrain$loud,SongsTrain$ener)
 
+model2<-glm(Top10~.,data=SongsTrain,family="binomial") #keep energy, del loudness
+model3<-glm(Top10~.,data=SongsTrain,family="binomial") #keep loudness, del energy
