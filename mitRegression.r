@@ -439,3 +439,53 @@ table(SongsTest$Top10,predictTestSongs>=.45)
 base<-read.csv("./data/baseball.csv")
 str(base)
 table(base$Year)
+baseball<-subset(base,base$Playoffs == 1)
+str(baseball)
+table(baseball$Year)
+PlayoffTable = table(baseball$Year)
+names(PlayoffTable)
+PlayoffTable[c("1990","2001")]
+baseball$NumCompetitors = PlayoffTable[as.character(baseball$Year)] 
+nrow(baseball[baseball$NumCompetitors==8,])
+baseball$WorldSeries = as.numeric(baseball$RankPlayoffs == 1)
+nrow(baseball[baseball$WorldSeries==0,])
+
+
+str(baseball)
+model1<-glm(WorldSeries~Year,data=baseball,family = "binomial")
+summary(model1)
+model2<-glm(WorldSeries~RS,data=baseball,family = "binomial")
+
+model3<-glm(WorldSeries~RA,data=baseball,family = "binomial")
+
+model4<-glm(WorldSeries~W,data=baseball,family = "binomial")
+
+model5<-glm(WorldSeries~OBP,data=baseball,family = "binomial")
+
+model6<-glm(WorldSeries~SLG,data=baseball,family = "binomial")
+
+model7<-glm(WorldSeries~BA,data=baseball,family = "binomial")
+
+model8<-glm(WorldSeries~RankSeason,data=baseball,family = "binomial")
+
+model9<-glm(WorldSeries~OOBP,data=baseball,family = "binomial")
+
+model10<-glm(WorldSeries~OSLG,data=baseball,family = "binomial")
+
+model11<-glm(WorldSeries~NumCompetitors,data=baseball,family = "binomial")
+
+model12<-glm(WorldSeries~League,data=baseball,family = "binomial")
+
+model13<-glm(WorldSeries~Year+RA,data=baseball,family = "binomial")
+model14<-glm(WorldSeries~Year+RankSeason,data=baseball,family = "binomial")
+model15<-glm(WorldSeries~Year+NumCompetitors,data=baseball,family = "binomial")
+model16<-glm(WorldSeries~Year+NumCompetitors,data=baseball,family = "binomial")
+model17<-glm(WorldSeries~RA+RankSeason,data=baseball,family = "binomial")
+model18<-glm(WorldSeries~RA+NumCompetitors,data=baseball,family = "binomial")
+model18<-glm(WorldSeries~RankSeason+NumCompetitors,data=baseball,family = "binomial")
+
+cor(baseball$Year,baseball$RA)
+cor(baseball$Year,baseball$RankSeason)
+cor(baseball$Year,baseball$NumCompetitors)
+cor(baseball$RA,baseball$NumCompetitors)
+cor(baseball$RankSeason,baseball$NumCompetitors)
