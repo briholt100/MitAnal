@@ -457,7 +457,7 @@ summary(model1)
 model2<-glm(WorldSeries~RS,data=baseball,family = "binomial")
 
 model3<-glm(WorldSeries~RA,data=baseball,family = "binomial")
-
+summary(model3)
 model4<-glm(WorldSeries~W,data=baseball,family = "binomial")
 
 model5<-glm(WorldSeries~OBP,data=baseball,family = "binomial")
@@ -482,10 +482,29 @@ model15<-glm(WorldSeries~Year+NumCompetitors,data=baseball,family = "binomial")
 model16<-glm(WorldSeries~Year+NumCompetitors,data=baseball,family = "binomial")
 model17<-glm(WorldSeries~RA+RankSeason,data=baseball,family = "binomial")
 model18<-glm(WorldSeries~RA+NumCompetitors,data=baseball,family = "binomial")
-model18<-glm(WorldSeries~RankSeason+NumCompetitors,data=baseball,family = "binomial")
+model19<-glm(WorldSeries~RankSeason+NumCompetitors,data=baseball,family = "binomial")
 
 cor(baseball$Year,baseball$RA)
 cor(baseball$Year,baseball$RankSeason)
 cor(baseball$Year,baseball$NumCompetitors)
 cor(baseball$RA,baseball$NumCompetitors)
 cor(baseball$RankSeason,baseball$NumCompetitors)
+
+
+parole<-read.csv("./data/parole.csv")
+str(parole)
+table(parole$violator)
+summary(parole)
+parole$state<-as.factor(parole$state)
+parole$crime<-as.factor(parole$crime)
+
+
+set.seed(144)
+
+library(caTools)
+
+split = sample.split(parole$violator, SplitRatio = 0.7)
+
+ train = subset(parole, split == TRUE)
+
+ test = subset(parole, split == FALSE)
