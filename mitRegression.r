@@ -339,3 +339,10 @@ library(ROCR)
 ROCRpred<-prediction(predictTrain,qualityTrain$PoorCare)
 ROCRperf<-performance(ROCRpred, "tpr","fpr")
 plot(ROCRperf,colorize =T, print.cutoffs.at=seq(0,1,0.1),text.adj=c(-0.2,1.7),)
+
+
+
+predictTest = predict(QualityLog, type="response", newdata=qualityTest)
+ROCRpredTest = prediction(predictTest, qualityTest$PoorCare)
+
+auc = as.numeric(performance(ROCRpredTest, "auc")@y.values)
