@@ -352,3 +352,29 @@ auc = as.numeric(performance(ROCRpredTest, "auc")@y.values)
 
 framingham<-read.csv("./data/framingham.csv")
 str(framingham)
+library(caTools)
+set.seed(1000)
+split<-sample.split(framingham$Ten,SplitRatio = .65)
+train<-subset(framingham,split ==T)
+test<-subset(framingham,split ==F)
+
+framinghamLog<-glm(TenYearCHD~.,data=train,family="binomial")
+summary(framinghamLog)
+
+
+predictTest<-predict(framinghamLog,type="response",newdata=test)
+
+table(test$TenYearCHD,predictTest>.5)
+
+#Overall accuracy is TN and TP divided by total N
+(1069+11)/sum(1069,187,6,11)
+
+##baseline method suggests that you would predict 0, 
+#so that would be getting an accuracy of adding up the accuracy row, or 1069+6
+#divided by total number of N.
+(1069+6)/sum(1069,187,6,11)
+
+ROCRpred<-prediction(predictTest,test$TenYearCHD)
+as.numeric(performance(ROCRpred,"auc")@y.values)
+11/(187+11)
+1069/(1069+6)
