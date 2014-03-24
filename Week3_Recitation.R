@@ -19,7 +19,7 @@ summary(simple)
 set.seed(144)
 imputed = complete(mice(simple))
 summary(imputed)
-polling$Rasmussen = imputed$Rasmussen
+  polling$Rasmussen = imputed$Rasmussen
 polling$SurveyUSA = imputed$SurveyUSA
 summary(polling)
 
