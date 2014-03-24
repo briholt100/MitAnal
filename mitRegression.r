@@ -391,3 +391,9 @@ songs$songtitle
 subset(songs[,c(1,2,39)],songs$artistname=="Michael Jackson")
 table(songs$timesignature)
 songs[which.max(songs$tempo),]
+
+
+SongsTrain<-subset(songs,songs$year<=2009)
+SongsTest<-subset(songs,songs$year>2009)
+nrow(SongsTrain)
+model1<-glm(Top10~.,data=SongsTrain,family="binomial")
