@@ -378,3 +378,7 @@ ROCRpred<-prediction(predictTest,test$TenYearCHD)
 as.numeric(performance(ROCRpred,"auc")@y.values)
 11/(187+11)
 1069/(1069+6)
+
+#recitation and predicting elections
+#see script week3_recitation.r
+
