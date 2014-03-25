@@ -621,3 +621,17 @@ test$profit[test$not.fully.paid == 1] = -1
 
 #What is the maximum profit of a $10 investment in any loan in the testing set (do not include the $ sign in your answer)?
 summary(test$profit*10)
+
+
+highInterest <- subset(test,test$int.rate>=.15)
+str(highInterest)
+mean(highInterest$profit)
+table(highInterest$not.fully.paid)
+110/437  #proportion not paid back fully
+cutoff = sort(highInterest$predicted.risk, decreasing=FALSE)[100]
+
+selectedLoans <-subset(highInterest,highInterest$predicted.risk<=cutoff)
+str(selectedLoans)
+sum (selectedLoans$profit) #profit
+
+table(selectedLoans$not.fully.paid)
