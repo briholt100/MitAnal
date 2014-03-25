@@ -578,5 +578,46 @@ A-B
 exp(A)/exp(B)  #this converts into the odds of each A and B, but then Odds A to B
 
 test$predicted.risk<-predict(mod1,newdata=test,type="response")
-nrow(test)
-length(predicted.risk)
+
+table(test$not.fully.paid,test$predicted.risk >=.5)
+2400/(2403+13+457)
+
+#baseline test$not.fully.paid baserate
+
+table(test$not.fully.paid)
+2413/(nrow(test))
+
+ROCRpredict<-prediction(test$predicted.risk,test$not.fully.paid)
+ROCRperf<-performance(ROCRpredict, "tpr","fpr")
+auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
+
+
+##########
+modIntRate<-glm(not.fully.paid~int.rate,data=train,family="binomial")
+summary(modIntRate)
+
+modIntRatePrediction<-predict(modIntRate,newdata=test,type="response")
+
+summary(modIntRatePrediction)
+
+table(test$not.fully.paid, modIntRatePrediction >= .5)
+
+ROCRpredict<-prediction(modIntRatePrediction,test$not.fully.paid)
+ROCRperf<-performance(ROCRpredict, "tpr","fpr")
+auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
+######
+
+"To compute interest revenue, 
+consider a $c investment in a loan that has an annual interest rate r over a period
+of t years. Using continuous compounding of interest, this investment pays back c * exp(rt) 
+dollars by the end of the t years, where exp(rt) is e raised to the r*t power."  
+c=10
+r = .06 
+t = 3
+c * exp(r*t)
+
+test$profit = exp(test$int.rate*3) - 1
+test$profit[test$not.fully.paid == 1] = -1
+
+#What is the maximum profit of a $10 investment in any loan in the testing set (do not include the $ sign in your answer)?
+summary(test$profit*10)
