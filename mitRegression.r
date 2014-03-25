@@ -336,6 +336,7 @@ par(mfrow=c(1,1))
 PoorCareLog<-glm(PoorCare~StartedOnCombination+ProviderCount,data=qualityTrain,family=binomial)
 summary(PoorCareLog)
 
+install.packages("gplots")
 install.packages("ROCR")
 library(ROCR)
 ROCRpred<-prediction(predictTrain,qualityTrain$PoorCare)
