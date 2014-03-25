@@ -541,3 +541,23 @@ library(ROCR)
 ROCRpredVio = prediction(predictVio, test$violator)
 
 auc = as.numeric(performance(ROCRpredVio, "auc")@y.values)
+####
+#week 3 final assignment
+
+
+loans<-read.csv("./data/loans.csv")
+str(loans)
+summary(loans)
+sort(table(loans$not.fully.paid))
+1533/(1533+8045)
+
+library(mice)
+set.seed(144)
+vars.for.imputation = setdiff(names(loans), "not.fully.paid")
+imputed = complete(mice(loans[vars.for.imputation]))
+loans[vars.for.imputation] = imputed
+
+head(read.csv("./data/loans_imputed.csv"))
+head(loans)
+
+set.seed(144)
