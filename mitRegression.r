@@ -491,7 +491,7 @@ cor(baseball$Year,baseball$NumCompetitors)
 cor(baseball$RA,baseball$NumCompetitors)
 cor(baseball$RankSeason,baseball$NumCompetitors)
 
-
+##############
 parole<-read.csv("./data/parole.csv")
 str(parole)
 table(parole$violator)
@@ -535,10 +535,9 @@ table(test$violator,predictVio>=.5)
 table(test$violator)
 baseline<-179/(179+23)
 
-update.packages()
 install.packages("ROCR")
 library(ROCR)
-ROCRpredVio = prediction(predictVio, test$violator)
+  ROCRpredVio = prediction(predictVio, test$violator)
 
 auc = as.numeric(performance(ROCRpredVio, "auc")@y.values)
 ####
