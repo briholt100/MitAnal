@@ -501,7 +501,7 @@ parole$crime<-as.factor(parole$crime)
 
 
 set.seed(144)
-
+install.packages("caTools")
 library(caTools)
 
 split = sample.split(parole$violator, SplitRatio = 0.7)
