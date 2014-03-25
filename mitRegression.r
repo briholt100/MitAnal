@@ -531,3 +531,5 @@ table(test$violator,predictVio>=.5)
 12/23
 #specificity
 167/(167+12)
+table(test$violator)
+baseline<-179/(179+23)
