@@ -534,3 +534,10 @@ table(test$violator,predictVio>=.5)
 167/(167+12)
 table(test$violator)
 baseline<-179/(179+23)
+
+
+install.packages("ROCR")
+library(ROCR)
+ROCRpredVio = prediction(predictVio, test$violator)
+
+auc = as.numeric(performance(ROCRpredVio, "auc")@y.values)
