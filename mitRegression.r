@@ -556,10 +556,11 @@ vars.for.imputation = setdiff(names(loans), "not.fully.paid")
 imputed = complete(mice(loans[vars.for.imputation]))
 loans[vars.for.imputation] = imputed
 
-loans<-read.csv("./data/loans_imputed.csv"))
+loans<-read.csv("./data/loans_imputed.csv")
 head(loans)
 
 set.seed(144)
+library(caTools)
 split<-sample.split(loans$not.fully.paid,SplitRatio = .7)
 train<-subset(loans,split==T)
 test<-subset(loans,split==F)
