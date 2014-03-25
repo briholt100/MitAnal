@@ -557,7 +557,26 @@ vars.for.imputation = setdiff(names(loans), "not.fully.paid")
 imputed = complete(mice(loans[vars.for.imputation]))
 loans[vars.for.imputation] = imputed
 
-head(read.csv("./data/loans_imputed.csv"))
+loans<-read.csv("./data/loans_imputed.csv"))
 head(loans)
 
 set.seed(144)
+split<-sample.split(loans$not.fully.paid,SplitRatio = .7)
+train<-subset(loans,split==T)
+test<-subset(loans,split==F)
+
+str(train)
+str(test)
+
+mod1<-glm(not.fully.paid~.,data=train,family=binomial)
+summary(mod1)
+
+A<--9.317e-03*700  #creates logit function from beta coef
+B<--9.317e-03*710
+A-B
+
+exp(A)/exp(B)  #this converts into the odds of each A and B, but then Odds A to B
+
+test$predicted.risk<-predict(mod1,newdata=test,type="response")
+nrow(test)
+length(predicted.risk)
