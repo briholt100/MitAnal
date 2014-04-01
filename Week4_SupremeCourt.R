@@ -32,6 +32,7 @@ library(rpart.plot)
 StevensTree = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, method="class", data = Train, control=rpart.control(minbucket=25))
 prp(StevensTree)
 
+table(stevens$Resp)
 # Make predictions
 PredictCART = predict(StevensTree, newdata = Test, type = "class")
 table(Test$Reverse, PredictCART)
@@ -47,6 +48,14 @@ pred = prediction(PredictROC[,2], Test$Reverse)
 perf = performance(pred, "tpr", "fpr")
 plot(perf)
 
+
+auc = as.numeric(performance(pred, "auc")@y.values)
+
+StevensTree2 = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, method="class", data = Train, control=rpart.control(minbucket=5))
+prp(StevensTree2)
+
+StevensTree3 = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, method="class", data = Train, control=rpart.control(minbucket=100))
+prp(StevensTree3)
 
 
 # VIDEO 5 - Random Forests
