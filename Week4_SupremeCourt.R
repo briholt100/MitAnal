@@ -72,11 +72,13 @@ Train$Reverse = as.factor(Train$Reverse)
 Test$Reverse = as.factor(Test$Reverse)
 
 # Try again
+set.seed(200)
 StevensForest = randomForest(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, data = Train, ntree=200, nodesize=25 )
 
 # Make predictions
 PredictForest = predict(StevensForest, newdata = Test)
 table(Test$Reverse, PredictForest)
+(41+75)/(41+36+18+75)
 (40+74)/(40+37+19+74)
 
 
@@ -84,6 +86,9 @@ table(Test$Reverse, PredictForest)
 # VIDEO 6
 
 # Install cross-validation packages
+install.packages("class")
+library(class)
+library(ggplot2)
 install.packages("caret")
 library(caret)
 install.packages("e1071")
