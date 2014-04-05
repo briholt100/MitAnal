@@ -86,7 +86,7 @@ table(Test$Reverse, PredictForest)
 # VIDEO 6
 
 # Install cross-validation packages
-install.packages("class")
+#install.packages("class")
 library(class)
 
 
@@ -96,21 +96,21 @@ library(ggplot2)
 
 #install.packages("plyr")
 library(plyr)
-install.packages("caret")
-#library(caret)
+#install.packages("caret")
+library(caret)
 #install.packages("e1071")
 library(e1071)
 
 # Define cross-validation experiment
-fitControl = trainControl( method = "cv", number = 10 )
-cartGrid = expand.grid( .cp = (1:50)*0.01) 
+fitControl = trainControl( method = "cv", number = 10 ) #cv=cross val, 10= folds
+cartGrid = expand.grid( .cp = (1:50)*0.01)  #this commands uses the increments of .01, but 50 times
 
 # Perform the cross validation
 train(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, data = Train, method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
 
 # Create a new CART model
 StevensTreeCV = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, method="class", data = Train, control=rpart.control(cp = 0.18))
-
+prp(StevensTreeCV)
 # Make predictions
 PredictCV = predict(StevensTreeCV, newdata = Test, type = "class")
 table(Test$Reverse, PredictCV)
