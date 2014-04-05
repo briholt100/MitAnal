@@ -23,9 +23,9 @@ Train = subset(stevens, split==TRUE)
 Test = subset(stevens, split==FALSE)
 
 # Install rpart library
-install.packages("rpart")
+#install.packages("rpart")
 library(rpart)
-install.packages("rpart.plot")
+#install.packages("rpart.plot")
 library(rpart.plot)
 
 # CART model
@@ -61,7 +61,7 @@ prp(StevensTree3)
 # VIDEO 5 - Random Forests
 
 # Install randomForest package
-install.packages("randomForest")
+#install.packages("randomForest")
 library(randomForest)
 
 # Build random forest model
@@ -88,10 +88,17 @@ table(Test$Reverse, PredictForest)
 # Install cross-validation packages
 install.packages("class")
 library(class)
+
+
+#install.packages("ggplot2")
 library(ggplot2)
+#install.packages("Rcpp")
+
+#install.packages("plyr")
+library(plyr)
 install.packages("caret")
-library(caret)
-install.packages("e1071")
+#library(caret)
+#install.packages("e1071")
 library(e1071)
 
 # Define cross-validation experiment
