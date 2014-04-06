@@ -38,3 +38,15 @@ CARTmodel3 = rpart(voting ~ civicduty + hawthorne + self + neighbors+sex, data=g
 prp(CARTmodel3)
 
 table(gerber$sex,gerber$vot)
+table(gerber$civ,gerber$vot)
+
+CARTmodel4 = rpart(voting ~ control, data=gerber, cp=0.0)
+prp(CARTmodel4,digits = 6)
+objects(CARTmodel4)
+
+CARTmodel5 = rpart(voting ~ control+sex, data=gerber, cp=0.0)
+prp(CARTmodel5,digits = 6)
+summary(CARTmodel5)
+
+abs(.296638-.34)
+
