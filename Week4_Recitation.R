@@ -68,7 +68,7 @@ plot(boston$LON, boston$LAT)
 points(boston$LON[boston$MEDV>=21.2], boston$LAT[boston$MEDV>=21.2], col="red", pch=20)
 
 fittedvalues = predict(latlontree)
-points(boston$LON[fittedvalues>21.2], boston$LAT[fittedvalues>=21.2], col="blue", pch="$")
+points(boston$LON[fittedvalues>21.2], boston$LAT[fittedvalues>=21.2], col="blue", pch=3)
 
 # Simplify tree by increasing minbucket
 latlontree = rpart(MEDV ~ LAT + LON, data=boston, minbucket=50)
@@ -78,8 +78,8 @@ text(latlontree)
 # Visualize Output
 plot(boston$LON,boston$LAT)
 abline(v=-71.07)
-abline(h=42.21)
-abline(h=42.17)
+abline(h=42.21, col="orange")
+abline(h=42.17, col ="blue")
 points(boston$LON[boston$MEDV>=21.2], boston$LAT[boston$MEDV>=21.2], col="red", pch=20)
 
 
