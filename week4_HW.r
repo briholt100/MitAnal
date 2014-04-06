@@ -20,4 +20,8 @@ votlog_predictions<-predict(votlog,type="response")
 output<-table(votlog_predictions >= .5, gerber$voting)
 overAll_accur<-(output[1,1]+output[2,2])/(sum(output))
 
-
+library(ROCR)
+ROCRpredict<-prediction(votlog_predictions,gerber$voting)
+ROCRperf<-performance(ROCRpredict, "tpr","fpr")
+auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
+######
