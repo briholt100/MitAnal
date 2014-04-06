@@ -25,3 +25,16 @@ ROCRpredict<-prediction(votlog_predictions,gerber$voting)
 ROCRperf<-performance(ROCRpredict, "tpr","fpr")
 auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 ######
+
+library(rpart)
+library(rpart.plot)
+CARTmodel = rpart(voting ~ civicduty + hawthorne + self + neighbors, data=gerber)
+prp(CARTmodel)
+
+CARTmodel2 = rpart(voting ~ civicduty + hawthorne + self + neighbors, data=gerber, cp=0.0)
+prp(CARTmodel2)
+
+CARTmodel3 = rpart(voting ~ civicduty + hawthorne + self + neighbors+sex, data=gerber, cp=0.0)
+prp(CARTmodel3)
+
+table(gerber$sex,gerber$vot)
