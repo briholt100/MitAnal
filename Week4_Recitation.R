@@ -13,7 +13,7 @@ setwd(paste0(home, "/mooc/MitAnal"))
 dater<-getwd()
 setwd(paste0(dater, "/MitAnal"))
 dir()
-boston = read.csv("boston.csv")
+boston = read.csv("./data/boston.csv")
 str(boston)
 
 # Plot observations
@@ -45,11 +45,11 @@ latlonlm = lm(MEDV ~ LAT + LON, data=boston)
 summary(latlonlm)
 
 # Visualize regression output
-plot(boston$LON, boston$LAT)
+plot(boston$LON, boston$LAT,pch=20)
 points(boston$LON[boston$MEDV>=21.2], boston$LAT[boston$MEDV>=21.2], col="red", pch=20)
 
 latlonlm$fitted.values
-points(boston$LON[latlonlm$fitted.values >= 21.2], boston$LAT[latlonlm$fitted.values >= 21.2], col="blue", pch="$")
+points(boston$LON[latlonlm$fitted.values >= 21.2], boston$LAT[latlonlm$fitted.values >= 21.2], col="blue", pch=3)
 
 
 
