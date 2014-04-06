@@ -145,3 +145,5 @@ best.tree.pred = predict(best.tree, newdata=test)
 best.tree.sse = sum((best.tree.pred - test$MEDV)^2)
 best.tree.sse
 
+ls()
+linreg.sse
