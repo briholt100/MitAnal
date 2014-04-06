@@ -13,4 +13,11 @@ table(gerber$civi,gerber$vot)
 table(gerber$haw,gerber$vot)
 table(gerber$neigh,gerber$vot)
 
-votlog<-glm(voting~hawthorne+civicduty+neighbors+self,data=gerber,method="binomial")
+votlog<-glm(voting~hawthorne+civicduty+neighbors+self,data=gerber,family="binomial")
+summary(votlog)
+votlog_predictions<-predict(votlog,type="response")
+
+output<-table(votlog_predictions >= .5, gerber$voting)
+overAll_accur<-(output[1,1]+output[2,2])/(sum(output))
+
+
