@@ -184,3 +184,17 @@ prp(cartLife4)
 
 cartLifePred4<-predict(cartLife4,data=statedata)
 SSE8<-sum((statedata$Life.Exp-cartLifePred4)^2)
+
+
+###part 4
+census<-read.csv("data/census.csv")
+str(census)
+library(caTools)
+
+set.seed(2000)
+split = sample.split(census$over50k, SplitRatio = 0.6)
+train = subset(census, split == TRUE)
+test = subset(census, split == FALSE)
+
+over50kLog<-glm(over50k~.,data=train,family=binomial)
+summary(over50kLog)
