@@ -198,3 +198,18 @@ test = subset(census, split == FALSE)
 
 over50kLog<-glm(over50k~.,data=train,family=binomial)
 summary(over50kLog)
+
+over50LogPredict<-predict(over50kLog,newdata=test,type="response")
+table(test$over50k,over50LogPredict>=.5)
+sum(9051,1888)/nrow(test)
+
+#baseline for test set
+table(test$over50k)
+9713/nrow(test)
+
+library(ROCR)
+
+
+ROCRpredTest = prediction(over50LogPredict, test$over50k)
+
+auc = as.numeric(performance(ROCRpredTest, "auc")@y.values)
