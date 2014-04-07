@@ -245,3 +245,22 @@ over50forest = randomForest(over50k ~ . -nativecountry, data=trainSmall )
 over50ForPred<-predict(over50forest,newdata=test)
 table(test$over50k,over50ForPred)
 sum(8871,2027)/nrow(test)
+
+vu = varUsed(over50forest, count=TRUE)
+vusorted = sort(vu, decreasing = FALSE, index.return = TRUE)
+
+dotchart(vusorted$x, names(over50forest$forest$xlevels[vusorted$ix]))
+varImpPlot(over50forest)
+
+install.packages("caret")
+library(caret)
+set.seed(2)
+cartGrid = expand.grid( .cp = seq(0.002,0.1,0.002))
+fitControl = trainControl( method = "cv", number = 10 ) #cv=cross val, 10= folds
+
+
+# Perform the cross validation
+set.seed(2)
+train(over50k~.,data=train, method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
+
+
