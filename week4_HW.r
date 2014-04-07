@@ -72,11 +72,8 @@ letters$isB = as.factor(letters$letter == "B")
 library(caTools)
 set.seed(1000)
 split<-sample.split(letters$isB,SplitRatio = .5)
-head(split,10)
 train<-subset(letters,split==T)
-str(train)
 test<-subset(letters,split==F)
-str(test)
 #baseline
 table(train$isB)
 1175/(383+1175)
@@ -101,3 +98,32 @@ PredictForest = predict(isBforest, newdata = test)
 table(test$isB, PredictForest)
 
 (1165+374)/(1165+10+374+9)
+
+letters$letter = as.factor(letters$letter)
+set.seed(2000)
+split<-sample.split(letters$letter,SplitRatio = .5)
+train2<-subset(letters,split==T)
+test2<-subset(letters,split==F)
+table(test2$letter)
+
+cartLetter2 = rpart(letter ~ . - isB, data=train2 , method ="class")
+#summary(cartLetter2)
+prp(cartLetter2)
+cartPred2<-predict(cartLetter2, newdata=test2, type ="class")
+table(test2$letter,cartPred2)
+(348+318+363+340)/nrow(test2)
+table(cartPred2)
+92+76+106+96
+head(train2)
+
+set.seed(1000)
+forestLetter2 = randomForest(letter ~ . - isB, data=train2 , method ="class")
+predForest2<-predict(forestLetter2,newdata=test2)
+table(test2$letter,predForest2)
+(390+380+393+364)/nrow(test2)
+
+
+#part 3
+
+data(state)
+statedata = data.frame(state.x77)
