@@ -198,10 +198,10 @@ SST<-sum((mean(climate_train$Temp)-climate_test$Temp)^2)
 ######
 getwd()
 home<-getwd()
-setwd(paste0(home, "/MOOC/mitanal/data"))
+setwd(paste0(home, "./MOOC/MitAnal"))
 
-pisaTrain<-read.csv("pisa2009train.csv")
-pisaTest<-read.csv("pisa2009test.csv")
+pisaTrain<-read.csv("./data/pisa2009train.csv")
+pisaTest<-read.csv("./data/pisa2009test.csv")
 str(pisaTrain)
 str(pisaTest)
 tapply(pisaTrain$readingS,pisaTrain$male,mean)
