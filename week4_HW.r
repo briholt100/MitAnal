@@ -151,3 +151,36 @@ prp(cartLife2)
 
 cartLifePred2<-predict(cartLife2,data=statedata)
 SSE5<-sum((statedata$Life.Exp-cartLifePred2)^2)
+
+
+library(caret)
+set.seed(111)
+
+# Define cross-validation experiment
+fitControl = trainControl( method = "cv", number = 10 ) #cv=cross val, 10= folds
+cartGrid = expand.grid( .cp = (1:50)*0.01)  #this commands uses the increments of .01, but 50 times
+
+# Perform the cross validation
+train(Life.Exp~.,data=statedata,  method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
+
+cartLife3<-rpart(Life.Exp~.,data=statedata,control=rpart.control(cp=.11))
+prp(cartLife3)
+
+cartLifePred3<-predict(cartLife3,data=statedata)
+SSE7<-sum((statedata$Life.Exp-cartLifePred3)^2)
+
+
+set.seed(111)
+
+# Define cross-validation experiment
+fitControl = trainControl( method = "cv", number = 10 ) #cv=cross val, 10= folds
+cartGrid = expand.grid( .cp = (1:50)*0.01)  #this commands uses the increments of .01, but 50 times
+
+# Perform the cross validation
+train(Life.Exp~Area,data=statedata,  method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
+#objects(output)
+cartLife4<-rpart(Life.Exp~Area,data=statedata,control=rpart.control(cp=.06))
+prp(cartLife4)
+
+cartLifePred4<-predict(cartLife4,data=statedata)
+SSE8<-sum((statedata$Life.Exp-cartLifePred4)^2)
