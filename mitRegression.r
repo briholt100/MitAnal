@@ -9,7 +9,7 @@ dir()
 #CPS
 ##########
 getwd()
-CPS<-read.csv("CPSData.csv")
+CPS<-read.csv("data/CPSData.csv")
 MetroAreaMap<-read.csv("MetroAreaCodes.csv")
 CountryMap<-read.csv("CountryCodes.csv")
 str(CountryMap)
