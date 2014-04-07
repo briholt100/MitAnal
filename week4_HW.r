@@ -64,5 +64,40 @@ predict(LogModel2, newdata=Possibilities, type="response")
 
 ##part2
 
-letters_ABPR<-read.csv("data/letters_ABPR.csv")
-str(letters_ABPR)
+letters<-read.csv("data/letters_ABPR.csv")
+str(letters)
+table(letters$letter)
+letters$isB = as.factor(letters$letter == "B")
+
+library(caTools)
+set.seed(1000)
+split<-sample.split(letters$isB,SplitRatio = .5)
+head(split,10)
+train<-subset(letters,split==T)
+str(train)
+test<-subset(letters,split==F)
+str(test)
+#baseline
+table(train$isB)
+1175/(383+1175)
+
+
+CARTb = rpart(isB ~ . - letter, data=train, method="class")
+prp(CARTb)
+
+cartPred<-predict(CARTb,test,type="class")
+table(test$isB,cartPred)
+(1118+340)/(1118+340+57+43)
+
+
+library(randomForest)
+set.seed(1000)
+
+isBforest = randomForest(isB ~ . - letter, data=train )
+plot(isBforest)
+
+# Make predictions
+PredictForest = predict(isBforest, newdata = test)
+table(test$isB, PredictForest)
+
+(1165+374)/(1165+10+374+9)
