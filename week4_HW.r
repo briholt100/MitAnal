@@ -264,3 +264,8 @@ set.seed(2)
 train(over50k~.,data=train, method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
 
 
+over50kcart2<-rpart(over50k~., data=train, cp=0.002)
+prp(over50kcart2)
+cart2pred<-predict(over50kcart2,newdata=test,type="class")
+table(test$over50k,cart2pred)
+sum(9178,1838)/nrow(test)
