@@ -50,3 +50,19 @@ summary(CARTmodel5)
 
 abs(.296638-.34)
 
+LogModelSex = glm(voting ~ control+sex, data=gerber,family="binomial")
+summary(LogModelSex)
+
+Possibilities = data.frame(sex=c(0,0,1,1),control=c(0,1,0,1))
+predict(LogModelSex, newdata=Possibilities, type="response")
+
+LogModel2 = glm(voting ~ sex + control + sex:control, data=gerber, family="binomial")
+summary(LogModel2)
+
+predict(LogModel2, newdata=Possibilities, type="response")
+
+
+##part2
+
+letters_ABPR<-read.csv("data/letters_ABPR.csv")
+str(letters_ABPR)
