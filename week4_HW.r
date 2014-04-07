@@ -207,9 +207,41 @@ sum(9051,1888)/nrow(test)
 table(test$over50k)
 9713/nrow(test)
 
+install.packages("ROCR")
 library(ROCR)
 
 
 ROCRpredTest = prediction(over50LogPredict, test$over50k)
 
 auc = as.numeric(performance(ROCRpredTest, "auc")@y.values)
+
+
+library(rpart)
+install.packages("rpart.plot")
+library(rpart.plot)
+
+over50kCart<-rpart(over50k~.,data=train,method="class")
+prp(over50kCart)
+
+over50CartPred<-predict(over50kCart,newdata=test, type="class")
+table(test$over50k,over50CartPred)
+sum(9243,1596)/nrow(test)
+
+### to calc the ROC, must change to type "prob"
+over50CartPred<-predict(over50kCart,newdata=test, type="prob")
+ROCRpred<-prediction(over50CartPred[,2],test$over50k)
+ROCRperf<-performance(ROCRpred, "tpr","fpr")
+plot(ROCRperf,colorize =T, print.cutoffs.at=seq(0,1,0.1),text.adj=c(-0.2,1.7),)
+
+auc = as.numeric(performance(ROCRpred, "auc")@y.values)
+
+set.seed(1)
+
+trainSmall = train[sample(nrow(train), 2000), ]
+library(randomForest)
+set.seed(1)
+over50forest = randomForest(over50k ~ . -nativecountry, data=trainSmall )
+
+over50ForPred<-predict(over50forest,newdata=test)
+table(test$over50k,over50ForPred)
+sum(8871,2027)/nrow(test)
