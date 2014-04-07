@@ -127,3 +127,27 @@ table(test2$letter,predForest2)
 
 data(state)
 statedata = data.frame(state.x77)
+str(statedata)
+
+lifelm<-lm(Life.Exp~.,data=statedata)
+summary(lifelm)
+predictLife<-predict(lifelm,data=statedata)
+
+SSE<-  sum((statedata$Life.Exp-predictLife)^2)
+
+lifelm2<-lm(Life.Exp~Population+Murder+Frost+HS.Grad,data=statedata)
+summary(lifelm2)
+predictLife2<-predict(lifelm2,data=statedata)
+SSE2<-  sum((statedata$Life.Exp-predictLife2)^2)
+
+cartLife<-rpart(Life.Exp~.,data=statedata,control=rpart.control(minbucket=5))
+prp(cartLife)
+
+cartLifePred<-predict(cartLife,data=statedata)
+SSE<-sum((statedata$Life.Exp-cartLifePred)^2)
+
+cartLife2<-rpart(Life.Exp~Area,data=statedata,control=rpart.control(minbucket=1))
+prp(cartLife2)
+
+cartLifePred2<-predict(cartLife2,data=statedata)
+SSE5<-sum((statedata$Life.Exp-cartLifePred2)^2)
