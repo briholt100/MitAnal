@@ -155,7 +155,7 @@ library(randomForest)
 set.seed(123)
 
 tweetRF = randomForest(Negative ~ ., data=trainSparse)
-prp(tweetRF)
+
 # Make predictions:
 predictRF = predict(tweetRF, newdata=testSparse)
 
@@ -164,3 +164,11 @@ table(testSparse$Negative, predictRF)
 # Accuracy:
 (293+21)/(293+7+34+21)
 
+
+tweetLog = glm(Negative ~ ., data=trainSparse,family="binomial")
+summary(tweetLog)
+predictions = predict(tweetLog, newdata=testSparse, type="response")
+
+table(testSparse$Negative,predictions >= .5)
+
+(245+34)/nrow(testSparse)
