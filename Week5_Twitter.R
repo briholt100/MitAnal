@@ -86,6 +86,7 @@ inspect(frequencies[1000:1005,505:515])
 # Check for sparsity
 
 findFreqTerms(frequencies, lowfreq=20)
+findFreqTerms(frequencies, lowfreq=100)
 
 # Remove sparse terms
 
@@ -122,11 +123,15 @@ testSparse = subset(tweetsSparse, split==FALSE)
 # Build a CART model
 
 library(rpart)
+install.packages("rpart.plot")
 library(rpart.plot)
 
 tweetCART = rpart(Negative ~ ., data=trainSparse, method="class")
+table(trainSparse$Neg)[1]/nrow(trainSparse)
 
 prp(tweetCART)
+
+
 
 # Evaluate the performance of the model
 predictCART = predict(tweetCART, newdata=testSparse, type="class")
@@ -145,12 +150,12 @@ table(testSparse$Negative)
 
 
 # Random forest model
-
+install.packages("randomForest")
 library(randomForest)
 set.seed(123)
 
 tweetRF = randomForest(Negative ~ ., data=trainSparse)
-
+prp(tweetRF)
 # Make predictions:
 predictRF = predict(tweetRF, newdata=testSparse)
 
