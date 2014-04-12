@@ -99,7 +99,7 @@ str(labeledTerms)
 
 
 # Split the data
-
+install.packages("caTools")
 library(caTools)
 
 set.seed(144)
@@ -110,7 +110,8 @@ train = subset(labeledTerms, spl == TRUE)
 test = subset(labeledTerms, spl == FALSE)
 
 # Build a CART model
-
+install.packages("rpart")
+install.packages("rpart.plot")
 library(rpart)
 library(rpart.plot)
 
@@ -144,7 +145,7 @@ table(test$responsive)
 # Video 7
 
 # ROC curve
-
+install.packages("ROCR")
 library(ROCR)
 
 predROCR = prediction(pred.prob, test$responsive)
