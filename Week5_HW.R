@@ -64,3 +64,26 @@ sparseRemoved<-removeSparseTerms(dtmRemoved, 0.997)
 wordsRemoved<-as.data.frame(as.matrix(sparseRemoved))
 colnames(wordsRemoved) = paste("R", colnames(wordsRemoved))
 str(wordsRemoved)
+
+wikiWords<-cbind(wordsRemoved,wordsAdded)
+str(wikiWords)
+
+#
+wikiWords$Vandal = as.factor(wiki$Vandal)
+
+set.seed(123)
+spl = sample.split(wikiWords$Vandal, 0.7)
+
+train = subset(wikiWords, spl == TRUE)
+test = subset(wikiWords, spl == FALSE)
+
+table(test$Vandal)
+618/(nrow(test))
+
+618+545
+
+wikiCART<-rpart(Vandal~.,data=train,method="class")
+prp(wikiCART)
+
+prediction<-predict(wikiCART,data=test,type="class")
+table(train$Vandal,prediction)
