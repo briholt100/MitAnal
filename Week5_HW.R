@@ -85,5 +85,8 @@ table(test$Vandal)
 wikiCART<-rpart(Vandal~.,data=train,method="class")
 prp(wikiCART)
 
-prediction<-predict(wikiCART,data=test,type="class")
-table(train$Vandal,prediction)
+prediction<-predict(wikiCART,newdata=test,type="class")
+
+table(test$Vandal,prediction)
+
+(618+12)/nrow(test)
