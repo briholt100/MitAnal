@@ -373,3 +373,25 @@ stemSums<-colSums(emailsSparse[emailsSparse$spam == 1,])
 table(stemSums>=1000)
 
 sort(colSums(subset(emailsSparse, spam == 1)))
+
+emailsSparse$spam = as.factor(emailsSparse$spam)
+
+set.seed(123)
+spl = sample.split(emailsSparse$spam, 0.7)
+train = subset(emailsSparse, spl == TRUE)
+test = subset(emailsSparse, spl == FALSE)
+
+#Log
+spamLog<-glm(spam~.,data=train,family="binomial")
+summary(spamLog)
+
+#CART
+spamCART<-rpart(spam~.,data=train,method="class")
+prp(spamCART)
+
+#randomForest
+library(randomForest)
+set.seed(123)
+spamRF<-randomForest(spam~., data=train)
+prp(spamCRF)
+plot(spamCRF)
