@@ -325,4 +325,51 @@ performance(predROCR, "auc")@y.values
 
 emails<-read.csv("data/emails.csv",stringsAsFactors=F)
 str(emails)
+summary(emails)
 table(emails$spam)
+head(emails$text)
+nchar(emails[which.max(nchar(emails[,1])),1])
+which.min(nchar(emails[,1]))
+
+
+#### Create corpus
+
+corpus = Corpus(VectorSource(emails$text))
+
+corpus[[1]]
+
+
+# Pre-process data
+corpus <- tm_map(corpus, tolower)
+
+corpus <- tm_map(corpus, removePunctuation)
+
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
+
+corpus <- tm_map(corpus, stemDocument)
+
+# Look at first email
+corpus[[1]]
+
+# Create matrix
+
+dtm = DocumentTermMatrix(corpus)
+dtm
+
+# Remove sparse terms
+spdtm = removeSparseTerms(dtm, 0.95)
+
+# Create data frame
+emailsSparse = as.data.frame(as.matrix(spdtm))###
+str(emailsSparse)
+
+# Make all variable names R-friendly
+
+colnames(emailsSparse) = make.names(colnames(emailsSparse))
+which.max(colSums(emailsSparse))
+emailsSparse$spam<-emails$spam
+head(emailsSparse)
+stemSums<-colSums(emailsSparse[emailsSparse$spam == 1,])
+table(stemSums>=1000)
+
+sort(colSums(subset(emailsSparse, spam == 1)))
