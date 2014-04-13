@@ -393,5 +393,18 @@ prp(spamCART)
 library(randomForest)
 set.seed(123)
 spamRF<-randomForest(spam~., data=train)
-prp(spamCRF)
-plot(spamCRF)
+prp(spamRF)
+plot(spamRF)
+#For each model, obtain the predicted spam probabilities for the training set. 
+#Be careful to obtain probabilities instead of predicted classes, because we will be 
+#using these values to compute training set AUC values. Recall that you can obtain 
+#probabilities for CART models by not passing any type parameter to the predict() function, 
+#and you can obtain probabilities from a random forest by adding the argument type="prob". 
+#For CART and random forest, you need to select the second column of the output 
+#of the predict() function, corresponding to the probability of a message being spam.
+
+
+
+
+
+
