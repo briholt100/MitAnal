@@ -37,7 +37,7 @@ str(wiki)
 table(wiki$Vandal)
 
 
-corpusAdded = Corpus(VectorSource(wiki$Added))
+  corpusAdded = Corpus(VectorSource(wiki$Added))
 
 corpusAdded[[1]]
 
@@ -187,41 +187,68 @@ nchar(trials[which.max(nchar(trials[,2])),2])
 table(nchar(trials[,2])<1)
 trials[which.min(nchar(trials[,1])),1]
 
-corpusTitle
-corpusAbstract
 
+#### Create corpusTitle
 
-#### Create corpus
+corpusTitle = Corpus(VectorSource(trials$title))
 
-corpus = Corpus(VectorSource(emails$email))
-
-corpus[[1]]
+corpusTitle[[1]]
 
 
 # Pre-process data
-corpus <- tm_map(corpus, tolower)
+corpusTitle <- tm_map(corpusTitle, tolower)
 
-corpus <- tm_map(corpus, removePunctuation)
+corpusTitle <- tm_map(corpusTitle, removePunctuation)
 
-corpus <- tm_map(corpus, removeWords, stopwords("english"))
+corpusTitle <- tm_map(corpusTitle, removeWords, stopwords("english"))
 
-corpus <- tm_map(corpus, stemDocument)
+corpusTitle <- tm_map(corpusTitle, stemDocument)
 
-# Look at first email
-corpus[[1]]
-
-
-
-# Video 4
+# Look at first title
+corpusTitle[[1]]
 
 # Create matrix
 
-dtm = DocumentTermMatrix(corpus)
-dtm
+dtmTitle = DocumentTermMatrix(corpusTitle)
+dtmTitle
 
 # Remove sparse terms
-dtm = removeSparseTerms(dtm, 0.97)
-dtm
+dtmTitle = removeSparseTerms(dtmTitle, 0.95)
+dtmTitle
 
 # Create data frame
-labeledTerms = as.data.frame(as.matrix(dtm))###
+dtmTitle = as.data.frame(as.matrix(dtmTitle))###
+str(dtmTitle)
+
+#### Create corpusAbstract
+
+corpusAbstract = Corpus(VectorSource(trials$abstract))
+
+corpusAbstract[[1]]
+
+
+# Pre-process data
+corpusAbstract <- tm_map(corpusAbstract, tolower)
+
+corpusAbstract <- tm_map(corpusAbstract, removePunctuation)
+
+corpusAbstract <- tm_map(corpusAbstract, removeWords, stopwords("english"))
+
+corpusAbstract <- tm_map(corpusAbstract, stemDocument)
+
+# Look at first abstract
+corpusAbstract[[1]]
+
+# Create matrix
+
+dtmAbstract = DocumentTermMatrix(corpusAbstract)
+
+# Remove sparse terms
+dtmAbstract = removeSparseTerms(dtmAbstract, 0.95)
+
+# Create data frame
+dtmAbstract = as.data.frame(as.matrix(dtmAbstract))###
+str(dtmAbstract)
+
+which.max(apply(dtmAbstract,2,sum))
+  
