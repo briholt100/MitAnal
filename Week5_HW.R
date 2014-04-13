@@ -252,3 +252,40 @@ str(dtmAbstract)
 
 which.max(apply(dtmAbstract,2,sum))
   
+#the following is in preparation of merging the two df.
+colnames(dtmTitle) = paste0("T", colnames(dtmTitle))
+colnames(dtmAbstract) = paste0("A", colnames(dtmAbstract))
+
+dtm<-cbind(dtmTitle,dtmAbstract)
+dtm$trial<-trials$trial
+summary(dtm)
+
+
+##build the model
+
+set.seed(144)
+spl = sample.split(dtm$trial, 0.7)
+
+train = subset(dtm, spl == TRUE)
+test = subset(dtm, spl == FALSE)
+
+table(train$trial)
+730/(730+572)
+
+trialCART<-rpart(trial~.,data=train,method="class")
+prp(trialCART)
+
+cartPrediction<-predict(trialCART,data=train)[,2]
+head(cartPrediction)
+
+summary(cartPrediction)
+
+table(train$trial,cartPrediction>=.5)
+(631+441)/nrow(train)
+
+#sensitivity 
+#sensitivity is TP over that row 
+441/(131+441)
+# specificity is TN over that row 
+631/(631+99)
+
