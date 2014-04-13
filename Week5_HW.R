@@ -181,7 +181,47 @@ table(wikiTest3$Vandal,prediction4)
 ###neww set
 
 trials<-read.csv("data/clinical_trial.csv",stringsAsFactors=FALSE)
-summary(trials)
+str(trials)
 nchar(trials[which.max(nchar(trials[,2])),2])
 
+table(nchar(trials[,2])<1)
+trials[which.min(nchar(trials[,1])),1]
 
+corpusTitle
+corpusAbstract
+
+
+#### Create corpus
+
+corpus = Corpus(VectorSource(emails$email))
+
+corpus[[1]]
+
+
+# Pre-process data
+corpus <- tm_map(corpus, tolower)
+
+corpus <- tm_map(corpus, removePunctuation)
+
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
+
+corpus <- tm_map(corpus, stemDocument)
+
+# Look at first email
+corpus[[1]]
+
+
+
+# Video 4
+
+# Create matrix
+
+dtm = DocumentTermMatrix(corpus)
+dtm
+
+# Remove sparse terms
+dtm = removeSparseTerms(dtm, 0.97)
+dtm
+
+# Create data frame
+labeledTerms = as.data.frame(as.matrix(dtm))###
