@@ -298,7 +298,13 @@ prp(trialCART)
 predTest<-predict(trialCART,newdata=test)[,2]  #this might need a class type
 head(predTest)
 
+#FN are a problem because they won't be caught by an expert reviewer, 
+#so we try to reduce them by reducing the threshold
 table(test$trial,predTest>=.5)
+table(test$trial)
+table(predTest>=.5)
+apply(table(test$trial,predTest>=.5),2,sum)
+
 (261+162)/nrow(test)
 
 #ROC calc
@@ -314,3 +320,5 @@ plot(perfROCR, colorize=TRUE)
 performance(predROCR, "auc")@y.values
 
 
+
+##new problem set.
