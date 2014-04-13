@@ -7,8 +7,32 @@ dater<-getwd()
 setwd(paste0(dater, "/MitAnal"))
 dir()
 
+
 wiki<-read.csv("data/wiki.csv",stringsAsFactors=FALSE)
 wiki$Vandal = as.factor(wiki$Vandal)
+
+
+##load libraries:
+install.packages("flexclust")
+install.packages("ggplot2")
+install.packages("maps")
+install.packages("ggmap")
+install.packages("igraph")
+install.packages("wordcloud")
+install.packages("RColorBrewer")
+
+library(tm)
+library(SnowballC)
+library(flexclust)
+library(ggplot2)
+library(maps)
+library(ggmap)
+library(igraph)
+library(wordcloud)
+library(RColorBrewer)
+
+
+
 str(wiki)
 table(wiki$Vandal)
 
@@ -70,6 +94,7 @@ str(wikiWords)
 
 #
 wikiWords$Vandal = as.factor(wiki$Vandal)
+library(caTools)
 
 set.seed(123)
 spl = sample.split(wikiWords$Vandal, 0.7)
@@ -82,6 +107,8 @@ table(test$Vandal)
 
 618+545
 
+library(rpart)
+library(rpart.plot)
 wikiCART<-rpart(Vandal~.,data=train,method="class")
 prp(wikiCART)
 
