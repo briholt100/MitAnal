@@ -13,13 +13,13 @@ wiki$Vandal = as.factor(wiki$Vandal)
 
 
 ##load libraries:
-install.packages("flexclust")
-install.packages("ggplot2")
-install.packages("maps")
-install.packages("ggmap")
-install.packages("igraph")
-install.packages("wordcloud")
-install.packages("RColorBrewer")
+#install.packages("flexclust")
+#install.packages("ggplot2")
+#install.packages("maps")
+#install.packages("ggmap")
+#install.packages("igraph")
+#install.packages("wordcloud")
+#install.packages("RColorBrewer")
 
 library(tm)
 library(SnowballC)
@@ -176,3 +176,8 @@ prediction4<-predict(wikiCART4,newdata=wikiTest4,type="class")
 table(wikiTest3$Vandal,prediction4)
 
 (595+241)/nrow(wikiTest4)
+
+
+###neww set
+
+trials<-read.csv("data/clinical_trial.csv",stringsAsFactors=FALSE)
