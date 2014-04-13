@@ -322,3 +322,7 @@ performance(predROCR, "auc")@y.values
 
 
 ##new problem set.
+
+emails<-read.csv("data/emails.csv",stringsAsFactors=F)
+str(emails)
+table(emails$spam)
