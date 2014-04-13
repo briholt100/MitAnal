@@ -289,3 +289,28 @@ table(train$trial,cartPrediction>=.5)
 # specificity is TN over that row 
 631/(631+99)
 
+
+#predict onto test set
+
+trialCART<-rpart(trial~.,data=train,method="class")
+prp(trialCART)
+
+predTest<-predict(trialCART,newdata=test)[,2]  #this might need a class type
+head(predTest)
+
+table(test$trial,predTest>=.5)
+(261+162)/nrow(test)
+
+#ROC calc
+library(ROCR)
+predROCR = prediction(predTest, test$trial)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
