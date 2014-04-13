@@ -181,3 +181,7 @@ table(wikiTest3$Vandal,prediction4)
 ###neww set
 
 trials<-read.csv("data/clinical_trial.csv",stringsAsFactors=FALSE)
+summary(trials)
+nchar(trials[which.max(nchar(trials[,2])),2])
+
+
