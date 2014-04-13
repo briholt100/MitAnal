@@ -117,3 +117,62 @@ prediction<-predict(wikiCART,newdata=test,type="class")
 table(test$Vandal,prediction)
 
 (618+12)/nrow(test)
+
+
+##trying a different approach 2.1
+
+wikiWords2 = wikiWords
+wikiWords2$HTTP = ifelse(grepl("http",wiki$Added,fixed=TRUE), 1, 0)
+table(wikiWords2$HTTP)
+
+wikiTrain2 = subset(wikiWords2, spl==TRUE)
+
+wikiTest2 = subset(wikiWords2, spl==FALSE)
+
+wikiCART2<-rpart(Vandal~.+HTTP,data=wikiTrain2,method="class")
+prp(wikiCART2)
+
+prediction2<-predict(wikiCART2,newdata=wikiTest2,type="class")
+
+table(wikiTest2$Vandal,prediction2)
+
+(609+57)/nrow(wikiTest2)
+
+
+wikiWords2$NumWordsAdded = rowSums(as.matrix(dtmAdded))
+
+wikiWords2$NumWordsRemoved = rowSums(as.matrix(dtmRemoved))
+mean(wikiWords2$NumWordsAdded)
+
+wikiTrain3= subset(wikiWords2, spl==TRUE)
+
+wikiTest3 = subset(wikiWords2, spl==FALSE)
+
+wikiCART3<-rpart(Vandal~.,data=wikiTrain3,method="class")
+prp(wikiCART3)
+
+prediction3<-predict(wikiCART3,newdata=wikiTest3,type="class")
+
+table(wikiTest3$Vandal,prediction3)
+
+(514+248)/nrow(wikiTest3)
+
+
+####
+
+wikiWords3 = wikiWords2
+wikiWords3$Minor = wiki$Minor
+wikiWords3$Loggedin = wiki$Loggedin
+
+wikiTrain4= subset(wikiWords3, spl==TRUE)
+
+wikiTest4 = subset(wikiWords3, spl==FALSE)
+
+wikiCART4<-rpart(Vandal~.,data=wikiTrain4,method="class")
+prp(wikiCART4)
+
+prediction4<-predict(wikiCART4,newdata=wikiTest4,type="class")
+
+table(wikiTest3$Vandal,prediction4)
+
+(595+241)/nrow(wikiTest4)
