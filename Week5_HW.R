@@ -552,3 +552,24 @@ wordCount = rowSums(as.matrix(dtm))
 hist(wordCount,breaks=100,xlim=c(0,2000))
 hist(log(wordCount))
 
+emailsSparse$logWordCount<-log(wordCount)
+boxplot(logWordCount~spam, data=emailsSparse)
+
+spl #done earlier
+train2 = subset(emailsSparse, spl == TRUE)
+test2 = subset(emailsSparse, spl == FALSE)
+
+#CART
+spam2CART<-rpart(spam~.,data=train2,method="class")
+prp(spam2CART)
+
+predSpam2Cart<-predict(spam2CART,newdata=test2)[,2]
+table(test2$spam,predSpam2Cart>=.5)
+(1214+384)/nrow(test2)
+
+#randomForest
+set.seed(123)
+spam2RF<-randomForest(spam~.,data=train2)[,2]
+SpamPred2RF<-predict(spam2RF,newdata=test2,type="prob")[,2]
+table(test2$spam,SpamPred2RF>=.5)
+(1214+384)/nrow(test2)
