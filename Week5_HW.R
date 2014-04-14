@@ -544,3 +544,11 @@ plot(perfROCR, colorize=TRUE)
 # Compute AUC
 
 performance(predROCR, "auc")@y.values
+
+
+#New section
+#wordCount = rowSums(as.matrix(spdtm))
+wordCount = rowSums(as.matrix(dtm))
+hist(wordCount,breaks=100,xlim=c(0,2000))
+hist(log(wordCount))
+
