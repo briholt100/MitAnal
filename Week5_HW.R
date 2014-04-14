@@ -394,6 +394,9 @@ spamLog<-glm(spam~.,data=train,family="binomial")
 summary(spamLog)
 
 
+
+
+###training
 #Predict Log
 SpamPredLog<-predict(spamLog,type="response")
 table(SpamPredLog<0.00001)
@@ -470,3 +473,74 @@ performance(predROCR, "auc")@y.values
 
 
 
+###TESTING
+
+#Predict Log
+SpamPredLog<-predict(spamLog,newdata=test,type="response")
+table(SpamPredLog<0.00001)
+table(SpamPredLog>0.99999)
+table(SpamPredLog<0.00001,SpamPredLog>0.99999)
+table(SpamPredLog >= 0.00001 & SpamPredLog <= 0.99999)
+
+table(test$spam,SpamPredLog>=.5)
+(1257+376)/nrow(test)
+
+#auc
+library(ROCR)
+
+predROCR = prediction(SpamPredLog, test$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
+#CART
+spamCART<-rpart(spam~.,data=train,method="class")
+prp(spamCART)
+
+#Predict CART
+SpamPredCart<-predict(spamCART,newdata=test)[,2]
+head(SpamPredCart)
+table(test$spam,SpamPredCart>=.5)
+(1228+386)/nrow(test)
+
+
+predROCR = prediction(SpamPredCart, test$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
+#randomForest
+library(randomForest)
+set.seed(123)
+spamRF<-randomForest(spam~., data=train)
+prp(spamRF)
+plot(spamRF)
+
+#Predict RF
+SpamPredRF<-predict(spamRF,newdata=test,type="prob")[,2]
+head(SpamPredCart)
+table(test$spam,SpamPredRF>=.5)
+(1290+386)/nrow(test)
+
+
+predROCR = prediction(SpamPredRF, test$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
