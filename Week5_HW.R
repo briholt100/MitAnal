@@ -380,21 +380,7 @@ set.seed(123)
 spl = sample.split(emailsSparse$spam, 0.7)
 train = subset(emailsSparse, spl == TRUE)
 test = subset(emailsSparse, spl == FALSE)
-
-#Log
-spamLog<-glm(spam~.,data=train,family="binomial")
-summary(spamLog)
-
-#CART
-spamCART<-rpart(spam~.,data=train,method="class")
-prp(spamCART)
-
-#randomForest
-library(randomForest)
-set.seed(123)
-spamRF<-randomForest(spam~., data=train)
-prp(spamRF)
-plot(spamRF)
+str(train)
 #For each model, obtain the predicted spam probabilities for the training set. 
 #Be careful to obtain probabilities instead of predicted classes, because we will be 
 #using these values to compute training set AUC values. Recall that you can obtain 
@@ -402,6 +388,82 @@ plot(spamRF)
 #and you can obtain probabilities from a random forest by adding the argument type="prob". 
 #For CART and random forest, you need to select the second column of the output 
 #of the predict() function, corresponding to the probability of a message being spam.
+
+#Log
+spamLog<-glm(spam~.,data=train,family="binomial")
+summary(spamLog)
+
+
+#Predict Log
+SpamPredLog<-predict(spamLog,type="response")
+table(SpamPredLog<0.00001)
+table(SpamPredLog>0.99999)
+table(SpamPredLog<0.00001,SpamPredLog>0.99999)
+table(SpamPredLog >= 0.00001 & SpamPredLog <= 0.99999)
+
+table(train$spam,SpamPredLog>=.5)
+(3052+954)/nrow(train)
+
+#auc
+library(ROCR)
+
+predROCR = prediction(SpamPredLog, train$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
+#CART
+spamCART<-rpart(spam~.,data=train,method="class")
+prp(spamCART)
+
+#Predict CART
+SpamPredCart<-predict(spamCART,newdata=train)[,2]
+head(SpamPredCart)
+table(train$spam,SpamPredCart>=.5)
+(2885+894)/nrow(train)
+
+
+predROCR = prediction(SpamPredCart, train$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
+#randomForest
+library(randomForest)
+set.seed(123)
+spamRF<-randomForest(spam~., data=train)
+prp(spamRF)
+plot(spamRF)
+
+#Predict RF
+SpamPredRF<-predict(spamRF,newdata=train,type="prob")[,2]
+head(SpamPredCart)
+table(train$spam,SpamPredRF>=.5)
+(3046+958)/nrow(train)
+
+
+
+predROCR = prediction(SpamPredRF, train$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
 
 
 
