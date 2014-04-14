@@ -602,3 +602,14 @@ install.packages("RTextTools")
 library(RTextTools)
 dtm2gram = create_matrix(as.character(corpus), ngramLength=2)
 dtm2gram
+
+spdtm2gram<-removeSparseTerms(dtm2gram, 0.95)
+
+
+emailsSparse2gram<-as.data.frame(as.matrix(spdtm2gram))
+colnames(emailsSparse2gram) = make.names(colnames(emailsSparse2gram))
+emailsCombined = cbind(emailsSparse, emailsSparse2gram)
+
+spl #done earlier
+trainCombined = subset(emailsCombined, spl == TRUE)
+testCombined = subset(emailsCombined, spl == FALSE)
