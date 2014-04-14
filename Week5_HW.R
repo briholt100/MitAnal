@@ -613,3 +613,16 @@ emailsCombined = cbind(emailsSparse, emailsSparse2gram)
 spl #done earlier
 trainCombined = subset(emailsCombined, spl == TRUE)
 testCombined = subset(emailsCombined, spl == FALSE)
+
+spamCARTcombined<-rpart(spam~.,data=trainCombined,method="class")
+prp(spamCARTcombined)
+
+
+##forest
+
+
+set.seed(123)
+spamRFcombined<-randomForest(spam~.,data=trainCombined)[,2]
+SpamPred2RF<-predict(spamRFcombined,newdata=testCombined,type="prob")[,2]
+table(testCombined$spam,SpamPred2RF>=.5)
+(1296+383)/nrow(testCombined)
