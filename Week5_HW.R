@@ -615,14 +615,42 @@ trainCombined = subset(emailsCombined, spl == TRUE)
 testCombined = subset(emailsCombined, spl == FALSE)
 
 spamCARTcombined<-rpart(spam~.,data=trainCombined,method="class")
-prp(spamCARTcombined)
+prp(spamCARTcombined,varlen=0)
+spamCartComboPred<-predict(spamCARTcombined,newdata=testCombined)[,2]
+table(testCombined$spam,spamCartComboPred>=.5)
+(1233+374)/nrow(testCombined)
+
+predROCR = prediction(spamCartComboPred, testCombined$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
 
 
 ##forest
-
 
 set.seed(123)
 spamRFcombined<-randomForest(spam~.,data=trainCombined)[,2]
 SpamPred2RF<-predict(spamRFcombined,newdata=testCombined,type="prob")[,2]
 table(testCombined$spam,SpamPred2RF>=.5)
 (1296+383)/nrow(testCombined)
+
+
+
+spredROCR = prediction(SpamPred2RF, testCombined$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
+
