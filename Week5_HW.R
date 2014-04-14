@@ -567,9 +567,38 @@ predSpam2Cart<-predict(spam2CART,newdata=test2)[,2]
 table(test2$spam,predSpam2Cart>=.5)
 (1214+384)/nrow(test2)
 
+predROCR = prediction(predSpam2Cart, test2$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
 #randomForest
 set.seed(123)
 spam2RF<-randomForest(spam~.,data=train2)[,2]
 SpamPred2RF<-predict(spam2RF,newdata=test2,type="prob")[,2]
 table(test2$spam,SpamPred2RF>=.5)
-(1214+384)/nrow(test2)
+(1296+383)/nrow(test2)
+
+spredROCR = prediction(SpamPred2RF, test2$spam)
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE)
+
+# Compute AUC
+
+performance(predROCR, "auc")@y.values
+
+
+
+###n-grams
+install.packages("RTextTools")
+library(RTextTools)
+dtm2gram = create_matrix(as.character(corpus), ngramLength=2)
+dtm2gram
