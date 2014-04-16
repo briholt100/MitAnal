@@ -6,7 +6,7 @@
 getwd()
 dir()
 
-movies = read.table("./MOOC/MitAnal/data/movieLens.txt", header=FALSE, sep="|",quote="\"")
+movies = read.table("./data/movieLens.txt", header=FALSE, sep="|",quote="\"")
 
 str(movies)
 
@@ -48,7 +48,8 @@ clusterGroups = cutree(clusterMovies, k = 10)
 
 #Now let's figure out what the clusters are like.
 
-# Let's use the tapply function to compute the percentage of movies in each genre and cluster
+# Let's use the tapply function to compute the percentage 
+#of movies in each genre and cluster
 
 tapply(movies$Action, clusterGroups, mean)
 tapply(movies$Romance, clusterGroups, mean)
@@ -90,4 +91,15 @@ tapply(movies$Thri, clusterGroups, mean)
 tapply(movies$War, clusterGroups, mean)
 tapply(movies$Wes, clusterGroups, mean)
 
-lapply(movies,mean)
+spl = split(movies[2:20], clusterGroups)
+
+#Then you can use spl to access the different clusters, because
+spl[[1]]
+#is the same as
+subset(movies[2:20], clusterGroups == 1)
+
+#so colMeans(spl[[1]]) will output the centroid of cluster 1. 
+#But an even easier approach uses the lapply function. 
+#The following command will output the cluster centroids for all clusters:
+  
+  lapply(spl, colMeans)
