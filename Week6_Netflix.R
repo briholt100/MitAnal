@@ -26,14 +26,17 @@ movies = unique(movies)
 
 # Take a look at our data again:
 str(movies)
-
-
+table(movies$Comedy)
+table(movies$Western)
+table(movies$Romance , movies$Drama)
 
 # Video 7
 
 # Compute distances
 distances = dist(movies[2:20], method = "euclidean")
 
+install.packages("ROAuth")
+library(ROAuth)
 # Hierarchical clustering
 clusterMovies = hclust(distances, method = "ward") 
 
@@ -64,3 +67,27 @@ cluster2 = subset(movies, clusterGroups==2)
 # Look at the first 10 titles in this cluster:
 cluster2$Title[1:10]
 
+
+
+#uick Q#
+clusterGroups = cutree(clusterMovies, k = 2)
+
+tapply(movies$Action, clusterGroups, mean)
+tapply(movies$Romance, clusterGroups, mean)
+tapply(movies$Adve, clusterGroups, mean)
+tapply(movies$Anim, clusterGroups, mean)
+tapply(movies$Childr, clusterGroups, mean)
+tapply(movies$Com, clusterGroups, mean)
+tapply(movies$Crim, clusterGroups, mean)
+tapply(movies$Doc, clusterGroups, mean)
+tapply(movies$Dra, clusterGroups, mean)
+tapply(movies$Fant, clusterGroups, mean)
+tapply(movies$Film, clusterGroups, mean)
+tapply(movies$Hor, clusterGroups, mean)
+tapply(movies$Musi, clusterGroups, mean)
+tapply(movies$Mys, clusterGroups, mean)
+tapply(movies$Thri, clusterGroups, mean)
+tapply(movies$War, clusterGroups, mean)
+tapply(movies$Wes, clusterGroups, mean)
+
+lapply(movies,mean)
