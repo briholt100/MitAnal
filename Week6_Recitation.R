@@ -6,7 +6,7 @@ setwd("./MitAnal")
 
 flower = read.csv("./data/flower.csv", header=FALSE)
 str(flower)
-
+head(flower)
 # Change the data type to matrix
 flowerMatrix = as.matrix(flower)
 str(flowerMatrix)
