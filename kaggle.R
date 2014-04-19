@@ -1,15 +1,48 @@
 getwd()
 setwd("./MitAnal")
 dir()
-train<-read.csv("./data/Kaggle_train.csv")
-test<-read.csv("./data/Kaggle_test.csv")
+train<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
+test<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
 str(train)
+head(train[,4])
+summary(train)
+as.data.frame(summary(train[,4]))
+#create new variable, which is a sum of NA's
+sumNA<-NULL
+for (i in 1:length(train)){
+  for(j in 1:nrow(train)){
+    
+  sumNA<-c(sumNA,1)
+}}
+sumNA
+
+#be sure to evaluate the data for outliers.
+
+
+#answers <- read.csv("train.csv", stringsAsFactors=FALSE)
+#answers[answers==''] <- "IGNORED"
+
+#for (i in 1:ncol(train)){
+#  levels(train[,i])[levels(train[,i])==""] <- NA
+#}
+
+
+#train=read.csv("train.csv") and NOT read.csv("train.csv",na.strings="",stringsAsFactors=TRUE)
+
+
+
+
+
+
 table(train$Happy,train$Income)
+
+boxplot(train[,1])
+
 
 HappyLog<-lm(Happy~.,data=train,family="binomial")
 summary (HappyLog)
-happyStep<-step(HappyLog)
-
+#happyStep<-step(HappyLog)
+summary(happyStep)
 plot(train$YOB,train$Gender)
 cor(as.numeric(train$Q98197),as.numeric(train$Q113181),use="complete.obs",method="spearman") #mediate, pray
 summary(train)
