@@ -30,8 +30,9 @@ sumNA
 #train=read.csv("train.csv") and NOT read.csv("train.csv",na.strings="",stringsAsFactors=TRUE)
 
 
-
-
+##OUTLIERS
+par(mfrow = c(4,4))
+for(i in 1:length(train)){plot(train[,i],xlab=colnames(train[i]))}
 
 
 table(train$Happy,train$Income)
