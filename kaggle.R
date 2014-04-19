@@ -4,17 +4,28 @@ dir()
 train<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
 test<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
 str(train)
-head(train[,4])
+dim(train)
+head(train)
 summary(train)
-as.data.frame(summary(train[,4]))
+dim(train)
+sumObj<-(summary(train[]))
+str(sumObj)
+sumObj[1,24]  #I believe generally at the end of every summary column, if there are NA's, they will be there.  
+
+
 #create new variable, which is a sum of NA's
-sumNA<-NULL
-for (i in 1:length(train)){
-  for(j in 1:nrow(train)){
-    
-  sumNA<-c(sumNA,1)
-}}
+
+sumNA<-rep(0,nrow(train))
+for (i in 1:nrow(train)){
+  for(j in 1:ncol(train)){
+    if(is.na(train[i,j]) ==T) {
+      sumNA[i]<-sumNA[i]+1
+    }      
+  }
+}
 sumNA
+train$sumNA<-sumNA
+rm(sumNA)
 
 #be sure to evaluate the data for outliers.
 
@@ -22,24 +33,20 @@ sumNA
 #answers <- read.csv("train.csv", stringsAsFactors=FALSE)
 #answers[answers==''] <- "IGNORED"
 
-#for (i in 1:ncol(train)){
-#  levels(train[,i])[levels(train[,i])==""] <- NA
-#}
-
-
-#train=read.csv("train.csv") and NOT read.csv("train.csv",na.strings="",stringsAsFactors=TRUE)
 
 
 ##OUTLIERS
 par(mfrow = c(4,4))
 for(i in 1:length(train)){plot(train[,i],xlab=colnames(train[i]))}
+par(mfrow = c(1,1))
+plot(train[,111])
+hist(train[,111])
 
+table(train$Happy,train$sumNA>=45)
 
-table(train$Happy,train$Income)
+boxplot(train$Happy~train[,111]>60)
 
-boxplot(train[,1])
-
-
+##all variables
 HappyLog<-lm(Happy~.,data=train,family="binomial")
 summary (HappyLog)
 #happyStep<-step(HappyLog)
@@ -109,3 +116,10 @@ Df Sum of Sq    RSS     AIC
 - Q107869          2    7.8908 760.03 -6270.4
 - Q101162          2   13.4887 765.63 -6241.5
 - Q118237          2   17.2440 769.38 -6222.2
+
+
+
+###lm of NA
+
+lmHappyNA<-glm(Happy~sumNA,data=train,family="binomial")
+summary(lmHappyNA)
