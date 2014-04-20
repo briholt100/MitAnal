@@ -86,7 +86,7 @@ KMC$centers[2]
 dim(healthyClusters) = c(nrow(healthyMatrix), ncol(healthyMatrix))
 
 image(healthyClusters, axes = FALSE, col=rainbow(k))
-
+image(healthyClusters, axes = FALSE, col=gray(KMC$centers))
 
 
 # Video 6
@@ -96,6 +96,8 @@ image(healthyClusters, axes = FALSE, col=rainbow(k))
 tumor = read.csv("./data/tumor.csv", header=FALSE)
 tumorMatrix = as.matrix(tumor)
 tumorVector = as.vector(tumorMatrix)
+
+image(tumorMatrix,axes=FALSE,col=grey(seq(0,1,length=256)))
 
 # Apply clusters from before to new image, using the flexclust package
 install.packages("flexclust")
