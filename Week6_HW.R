@@ -40,7 +40,7 @@ kosClust6<-subset(kos,kosClusters == 6)
 kosClust7<-subset(kos,kosClusters == 7)
 
 
-#or do this: kosClust = split(kos, kosClusters)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
+#or do this: kosClustHeir = split(kos[,-1], kosClusters)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
 tail(sort(colMeans(kosClust1[-1])))
 tail(sort(colMeans(kosClust2[-1])))
 tail(sort(colMeans(kosClust3[-1])))
@@ -76,3 +76,8 @@ for (i in 1:7){
   
 }
 
+
+tableOut<-table(kosClusters, KMC$cluster) #kosClusters was derrived from heirarchical found way up above.  KMC is a k-means
+margin.table(tableOut, c(1,2))
+
+ftable(kosClusters, KMC$cluster)
