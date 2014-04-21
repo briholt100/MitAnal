@@ -66,13 +66,14 @@ str(KMC)
 kosKclusters = KMC$cluster
 KMC$centers[1]
 
-kosClust = split(kos[,-1],kosKclusters)
-for (i in 1:7){print(nrow(kosClust[[i]]))}
+kos.by.Clust = split(kos[,-1],kosKclusters)
+
+for (i in 1:k){print(nrow(kos.by.Clust[[i]]))}  #gives count of each cluster
 
 
-for (i in 1:7){
+for (i in 1:k){  #will show each clusters largest word's, sorted with largest at the tail
   print (i)
-  print(tail(sort(colMeans(kosClust[[i]]))))
+  print(tail(sort(colMeans(kos.by.Clust[[i]]))))
 }
 
 tableOut<-table(kosClusters, KMC$cluster) #kosClusters was derrived from heirarchical found way up above.  KMC is a k-means
@@ -119,7 +120,7 @@ set.seed(88)
 KMC = kmeans(airlinesNorm, centers = k, iter.max = 1000)
 str(KMC)
 objects(KMC)
-table(KMC$cluster)
+table(KMC$cluster) #gives count of each cluster
 
 # Extract clusters
 AirKclusters = KMC$cluster  #associated cluster with observations.  length should equal data nrow
@@ -163,9 +164,13 @@ lm.claims<-lm(reimbursement2009~.,data=train)
 summary(lm.claims)
 
 lmPred<-predict(lm.claims, newdata=test)
+
 SSE<-sum((lmPred-test$reimbursement2009)^2)
+
 SST
 RMSE<-sqrt(SSE/(nrow(test)-ncol(test)))
+
+RMSE<-sqrt(SSE/(nrow(test)))
 1-SSE/SST   #R^2
 ###alternative: rmse.lm = sqrt(mean((lmPred - test$reimbursement2009)^2))
 
@@ -177,5 +182,55 @@ SST =sum((test$reimbursement2009 - mean(claims$reimbursement2009))^2)  #the mean
 baseline.pred = mean(train$reimbursement2009)
 sqrt(mean((baseline.pred - test$reimbursement2009)^2))
 
+#smart baseline model where 2008 and 2009 costs are predicted to be equal
+# shoud look something like 2008 -2009 squred, averaged, then sqrt'd
+baseline.pred = sqrt(mean((train$reimbursement2009-train$reimbursement2008)^2))
 
+##cluster
+#the following removes the dependent variable
+train.limited = train
+train.limited$reimbursement2009 = NULL
+test.limited = test
+test.limited$reimbursement2009 = NULL
+
+library(caret)
+
+preproc = preProcess(train.limited)
+
+train.norm = predict(preproc, train.limited)
+
+test.norm = predict(preproc, test.limited)
+summary(test.norm)
+mean(test.norm$arthritis)
+
+mean(train.norm$arthritis)
+
+###k-means
+
+
+k =3
+
+# Run k-means
+set.seed(144)
+KM = kmeans(train.norm, centers = k)
+
+
+str(KM)
+
+# Extract clusters
+
+train.norm.Kclusters = KM$cluster  #associated cluster with observations.  length should equal data nrow
+KM$centers  #shows k-means clusters with varialbes
+lapply(split(train, KM$cluster), colMeans) #shows the cluster averages by non-normed data
+mean(train.norm$age)
+
+
+##3.5
+library(flexclust)
+
+km.kcca = as.kcca(KM, train.norm)
+
+cluster.train = predict(km.kcca)
+cluster.test = predict(km.kcca, newdata=test.norm)
+table(cluster.test,)
 
