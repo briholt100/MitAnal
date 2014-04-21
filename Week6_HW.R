@@ -232,5 +232,47 @@ km.kcca = as.kcca(KM, train.norm)
 
 cluster.train = predict(km.kcca)
 cluster.test = predict(km.kcca, newdata=test.norm)
-table(cluster.test,)
+table(cluster.test)
 
+train1<-subset(train,cluster.train==1)
+train2<-subset(train,cluster.train==2)
+train3<-subset(train,cluster.train==3)
+
+mean(train1$reimbursement2009)
+mean(train2$reimbursement2009)
+mean(train3$reimbursement2009)
+
+trainClust.split = split(train, cluster.train)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
+trainClust.split[[1]]
+
+test1<-subset(test,cluster.test==1)
+test2<-subset(test,cluster.test==2)
+test3<-subset(test,cluster.test==3)
+
+
+lm1<-lm(reimbursement2009~.,train1)
+lm2<-lm(reimbursement2009~.,train2)
+lm3<-lm(reimbursement2009~.,train3)
+
+lm1$coef
+lm2$coef
+lm3$coef
+
+pred.test1<-predict(lm1,newdata=test1)
+pred.test2<-predict(lm2,newdata=test2)
+pred.test3<-predict(lm3,newdata=test3)
+
+mean(pred.test1)
+mean(pred.test2)
+mean(pred.test3)
+SSE<-sum((pred.test1-test1$reimbursement2009)^2)
+
+rmse.lm1 = sqrt(mean((pred.test1 - test1$reimbursement2009)^2))
+rmse.lm2 = sqrt(mean((pred.test2 - test2$reimbursement2009)^2))
+rmse.lm3 = sqrt(mean((pred.test3 - test3$reimbursement2009)^2))
+
+
+all.predictions = c(pred.test1, pred.test2, pred.test3)
+all.outcomes = c(test1$reimbursement2009, test2$reimbursement2009, test3$reimbursement2009)
+
+rmse.all = sqrt(mean((all.predictions - all.outcomes)^2))
