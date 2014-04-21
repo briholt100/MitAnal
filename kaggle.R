@@ -1,4 +1,5 @@
 getwd()
+setwd("./mooc/MitAnalytic")
 setwd("./MitAnal")
 dir()
 train<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
