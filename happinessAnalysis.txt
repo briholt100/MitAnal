@@ -1,0 +1,48 @@
+Kaggle happiness analysis
+
+#1 Clean data for outliers
+#2 transformations?  Log?  
+look for impossible combinations?
+Look for right skew of HIst; 
+re-order categories such as income categories
+Re-level categories as baseline
+create new variables (such as NA count)
+consider ignoring NA  #(probably not a good strategy here)
+consider imputing new data to fill NA
+# 
+# Look at variables...read them
+#Hypothesize some interactions
+
+Consider the basic baseline models
+
+table(train$happy)
+
+#basic log and tree
+
+
+Log happy~.
+
+predictionLog<-predict()
+
+auc
+
+rpart happy~.
+predictionCART<-predict()
+auc
+
+randomForest happy~.
+predictionRF<-predict()
+auc
+
+Cluster analysis
+
+prepare data -> matrix -> vector (consdier viewing leek's course)
+distance(vector, euclidian
+hclust  on distance
+
+auc
+
+k-means
+How to determine k?  
+
+auc
