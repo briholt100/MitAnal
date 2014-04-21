@@ -123,3 +123,12 @@ Df Sum of Sq    RSS     AIC
 
 lmHappyNA<-glm(Happy~sumNA,data=train,family="binomial")
 summary(lmHappyNA)
+
+
+
+
+
+pisaTest <- na.omit(pisaTest)
+pisaTrain$raceeth = relevel(pisaTrain$raceeth, "White")
+pisaTest$raceeth = relevel(pisaTest$raceeth, "White")
+

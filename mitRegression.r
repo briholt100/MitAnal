@@ -226,7 +226,7 @@ RMSE<-sqrt(SSE/nrow(pisaTest))
 
 mean(pisaTrain$readingScore)  #predicted test score using pisaTrain (after changing values for raceeth)
 SST<-sum((mean(pisaTrain$readingScore)-pisaTest$readingScore)^2)
-1-SSE/SST
+1-SSE/SST   #R^2
 
 #############
 ##FluTrain

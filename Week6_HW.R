@@ -126,4 +126,56 @@ AirKclusters = KMC$cluster  #associated cluster with observations.  length shoul
 KMC$centers
 lapply(split(airlines, KMC$cluster), colMeans) #shows the cluster averages by non-normed data
 
+#####New problem, HW 6
+
+claims<-read.csv("./data/reimbursement.csv")
+str(claims)
+summary(claims)
+(rowSums(claims[,-c(1,13:14)]))
+NumConditions = rowSums(claims[,2:12])> 0  # the answer included an evaluation of every IV included in an OR statement wihthin a table.  claim$alz ==1 | claim$stroke ==1
+mean(NumConditions )
+
+
+corTable<-cor(claims)
+sort(corTable)
+
+hist(claims$reimbursement2009)
+
+
+claims$reimbursement2008 = log(claims$reimbursement2008+1)
+claims$reimbursement2009 = log(claims$reimbursement2009+1)
+log(0)
+hist(claims$reimbursement2009)
+table((claims$reimbursement2009==0))
+90498/(367507+90498)
+
+
+##split data
+
+set.seed(144)
+spl = sample(1:nrow(claims), size=0.7*nrow(claims))
+train = claims[spl,]
+test = claims[-spl,]
+
+
+#Linear regression
+lm.claims<-lm(reimbursement2009~.,data=train)
+summary(lm.claims)
+
+lmPred<-predict(lm.claims, newdata=test)
+SSE<-sum((lmPred-test$reimbursement2009)^2)
+SST
+RMSE<-sqrt(SSE/(nrow(test)-ncol(test)))
+1-SSE/SST   #R^2
+###alternative: rmse.lm = sqrt(mean((lmPred - test$reimbursement2009)^2))
+
+
+SSE=sum((test$reimbursement2009 - lmPred)^2) 
+SST =sum((test$reimbursement2009 - mean(claims$reimbursement2009))^2)  #the mean comes from the baseline model
+1-SSE/SST  # this is R^2 
+
+baseline.pred = mean(train$reimbursement2009)
+sqrt(mean((baseline.pred - test$reimbursement2009)^2))
+
+
 
