@@ -40,6 +40,8 @@ sumNA
 train$sumNA<-sumNA
 rm(sumNA)
 
+
+
 #create variable for test
 sumNA<-rep(0,nrow(test))
 for (i in 1:nrow(test)){
@@ -57,10 +59,10 @@ rm(sumNA)
 ##convert YOB to int
 train$YOB<-as.numeric(train$YOB)
 test$YOB<-as.numeric(test$YOB)
-class(train$YOB)
+
 
 ##reorder training Income
-table(train$Income)
+#table(train$Income)
 
 train$Income<-relevel(train$Income,ref="over $150,000")
 train$Income<-relevel(train$Income,ref="$100,001 - $150,000")
@@ -82,11 +84,6 @@ test$EducationLevel<-relevel(test$EducationLevel,ref="Current K-12")
 
 train$HouseholdStatus<-relevel(train$HouseholdStatus,ref="Single (no kids)")
 test$HouseholdStatus<-relevel(test$HouseholdStatus,ref="Single (no kids)")
-
-
-
-
-
 
 hist(as.numeric(train$Income),xlab=levels(train$income))
 #happy.by.incomeLog<-glm(Happy~Income,data=train,family=binomial)
@@ -125,7 +122,7 @@ table(train$Happy,train$sumNA>=45)
 
 
 ##all variables
-Happy.all.Log<-glm(Happy~. - UserID,data=train,family="binomial",na.action=na.omit)
+Happy.all.Log<-glm(Happy~. - UserID,data=train,family="binomial")
 summary(Happy.all.Log)
 objects(Happy.all.Log)
 
@@ -134,6 +131,7 @@ head(ss)
 #Take only the rows you want:
   ss_sig <- ss[ss[,"Pr(>|z|)"]<0.1,]
 rownames(ss_sig)
+
 
 HappyLog.mod1<-glm(Happy~YOB+HouseholdStatus+EducationLevel+Q124122+Q120194+Q119334+Q118237+Q116953+Q116441
 +Q116197+Q115602+Q115899+Q115390+Q114961+Q114517+Q113584+Q111848+Q108342+Q107869+Q102674+Q102289+Q101162+Q101596+Q100680
@@ -154,7 +152,50 @@ write.csv(submission2, "submission2.csv", row.names=FALSE)
 
 
 
-table(test$Happy,HappyLog.mod1_predictions >= .5)
+HappyLog.mod2<-glm(Happy~YOB
+                   +Income
+                   +HouseholdStatus
+                   +EducationLevel
+                   +Q124122
+                   +Q121699
+                   +Q120472
+                   +Q120194
+                   +Q119334
+                   +Q118237
+                   +Q116441
+                   +Q116197
+                   +Q115777
+                   +Q115390
+                   +Q114961
+                   +Q115195
+                   +Q114517
+                   +Q114386
+                   +Q111848
+                   +Q108856
+                   +Q107869
+                   +Q105840
+                   +Q102089
+                   +Q101162
+                   +Q101596
+                   +Q100680
+                   +Q99716
+                   +Q99581
+                   +Q98869
+                   +Q98197,data=train,family=binomial,na.action=na.exclude)
+
+summary(HappyLog.mod2)
+
+###TRY STEP
+HappyLogMod2Step<-step(HappyLog.mod2)
+###gives an error, one suggestion is to remove NA from original data
+
+HappyLog.mod2_predictions<-predict(HappyLog.mod2,newdata=test,type="response")
+
+
+
+
+
+output<-table(test$Happy,HappyLog.mod2_predictions >= .5)
 overAll_accur<-(output[1,1]+output[2,2])/(sum(output))
 
 library(ROCR)
