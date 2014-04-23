@@ -3,87 +3,70 @@ setwd("./mooc/MitAnalytic")
 setwd("./MitAnal")
 dir()
 trainSource<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
+#create new variable, which is a sum of NA's
+
+sumNA<-rep(0,nrow(trainSource))
+for (i in 1:nrow(trainSource)){
+  for(j in 1:ncol(trainSource)){
+    if(is.na(trainSource[i,j]) ==T) {
+      sumNA[i]<-sumNA[i]+1
+    }      
+  }
+}
+sumNA
+trainSource$sumNA<-sumNA
+rm(sumNA)
+
+
+#create new variable, a ratio of $vote to # of Questions  VQ_ratio
+###1 varialbe has no NA's.  So, 109 questions.  Ratio will be $votes/109
+sort(trainSource$votes/109)
+summary(trainSource[1:9])  #7 variables not like the others
+trainSource$VQ_ratio<-trainSource$votes/109
+which(trainSource$VQ_ratio<=.19)
+
+##convert YOB to int
+install.packages("lubridate")
+library(lubridate)
+trainSource$YOB<-as.Date(as.character(trainSource$YOB),format="%Y")
+year(trainSource$YOB)
+table(year(trainSource$YOB))
+#####################################big issue with outliers here
+
+##reorder training Income
+#table(train$Income)
+
+trainSource$Income<-relevel(trainSource$Income,ref="over $150,000")
+trainSource$Income<-relevel(trainSource$Income,ref="$100,001 - $150,000")
+trainSource$Income<-relevel(trainSource$Income,ref="$75,000 - $100,000")
+trainSource$Income<-relevel(trainSource$Income,ref="$50,000 - $74,999")
+trainSource$Income<-relevel(trainSource$Income,ref="$25,001 - $50,000")
+trainSource$Income<-relevel(trainSource$Income,ref="under $25,000")
+
+levels(trainSource$EducationLevel)
+trainSource$EducationLevel<-relevel(trainSource$EducationLevel,ref="Current K-12")
+
+trainSource$HouseholdStatus<-relevel(trainSource$HouseholdStatus,ref="Single (no kids)")
 
 library(caTools)
 set.seed(1000)
-split<-sample.split(trainSource$Happy,SplitRatio = .75)
+split<-sample.split(trainSource$Happy,SplitRatio = .7)
 train<-subset(trainSource,split==T)
 test<-subset(trainSource,split==F)
-
 str(train)
 str(test)
-summary(train)
-dim(train)
 
 #baesline train predcition of happy variable
 table(train$Happy)
-1953/nrow(train)  #  0.5637584
+1823/nrow(train)  #  0.563
 table(test$Happy)
-651/nrow(test)  #  0.5637584
+781/nrow(test)  #  0.563
 
 #sumObj<-(summary(train[]))
 #str(sumObj)
 #sumObj[1,24]  #I believe generally at the end of every summary column, if there are NA's, they will be there.  
 
 
-#create new variable, which is a sum of NA's
-
-sumNA<-rep(0,nrow(train))
-for (i in 1:nrow(train)){
-  for(j in 1:ncol(train)){
-    if(is.na(train[i,j]) ==T) {
-      sumNA[i]<-sumNA[i]+1
-    }      
-  }
-}
-sumNA
-train$sumNA<-sumNA
-rm(sumNA)
-
-
-
-#create variable for test
-sumNA<-rep(0,nrow(test))
-for (i in 1:nrow(test)){
-  for(j in 1:ncol(test)){
-    if(is.na(test[i,j]) ==T) {
-      sumNA[i]<-sumNA[i]+1
-    }      
-  }
-}
-sumNA
-test$sumNA<-sumNA
-rm(sumNA)
-
-
-##convert YOB to int
-train$YOB<-as.numeric(train$YOB)
-test$YOB<-as.numeric(test$YOB)
-
-
-##reorder training Income
-#table(train$Income)
-
-train$Income<-relevel(train$Income,ref="over $150,000")
-train$Income<-relevel(train$Income,ref="$100,001 - $150,000")
-train$Income<-relevel(train$Income,ref="$75,000 - $100,000")
-train$Income<-relevel(train$Income,ref="$50,000 - $74,999")
-train$Income<-relevel(train$Income,ref="$25,001 - $50,000")
-train$Income<-relevel(train$Income,ref="under $25,000")
-
-test$Income<-relevel(test$Income,ref="over $150,000")
-test$Income<-relevel(test$Income,ref="$100,001 - $150,000")
-test$Income<-relevel(test$Income,ref="$75,000 - $100,000")
-test$Income<-relevel(test$Income,ref="$50,000 - $74,999")
-test$Income<-relevel(test$Income,ref="$25,001 - $50,000")
-test$Income<-relevel(test$Income,ref="under $25,000")
-
-levels(train$EducationLevel)
-train$EducationLevel<-relevel(train$EducationLevel,ref="Current K-12")
-test$EducationLevel<-relevel(test$EducationLevel,ref="Current K-12")
-
-train$HouseholdStatus<-relevel(train$HouseholdStatus,ref="Single (no kids)")
-test$HouseholdStatus<-relevel(test$HouseholdStatus,ref="Single (no kids)")
 
 hist(as.numeric(train$Income),xlab=levels(train$income))
 #happy.by.incomeLog<-glm(Happy~Income,data=train,family=binomial)
@@ -181,22 +164,26 @@ HappyLog.mod2<-glm(Happy~YOB
                    +Q99716
                    +Q99581
                    +Q98869
-                   +Q98197,data=train,family=binomial,na.action=na.exclude)
+                   +Q98197,data=train,family=binomial)
 
 summary(HappyLog.mod2)
+objects(HappyLog.mod2)
+
 
 ###TRY STEP
 HappyLogMod2Step<-step(HappyLog.mod2)
 ###gives an error, one suggestion is to remove NA from original data
 
-HappyLog.mod2_predictions<-predict(HappyLog.mod2,newdata=test,type="response")
-
-
-
-
+HappyLog.mod2_predictions<-predict.glm(HappyLog.mod2,newdata=test,type="response")
 
 output<-table(test$Happy,HappyLog.mod2_predictions >= .5)
-overAll_accur<-(output[1,1]+output[2,2])/(sum(output))
+(74+142)/(74+38+44+142)
+
+submission3 = data.frame(UserID = test$UserID, Probability1 = HappyLog.mod2_predictions)
+write.csv(submission3, "submission3.csv", row.names=FALSE) 
+
+
+
 
 library(ROCR)
 ROCRpredict<-prediction(votlog_predictions,gerber$voting)
