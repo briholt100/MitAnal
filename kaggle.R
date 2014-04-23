@@ -2,8 +2,14 @@ getwd()
 setwd("./mooc/MitAnalytic")
 setwd("./MitAnal")
 dir()
-train<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
-test<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
+trainSource<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
+
+library(caTools)
+set.seed(1000)
+split<-sample.split(trainSource$Happy,SplitRatio = .75)
+train<-subset(trainSource,split==T)
+test<-subset(trainSource,split==F)
+
 str(train)
 str(test)
 summary(train)
@@ -11,7 +17,9 @@ dim(train)
 
 #baesline train predcition of happy variable
 table(train$Happy)
-2604/(2015+2604)  #  0.5637584
+1953/nrow(train)  #  0.5637584
+table(test$Happy)
+651/nrow(test)  #  0.5637584
 
 #sumObj<-(summary(train[]))
 #str(sumObj)
@@ -127,40 +135,22 @@ head(ss)
   ss_sig <- ss[ss[,"Pr(>|z|)"]<0.1,]
 rownames(ss_sig)
 
-HappyLog.mod1<-glm(Happy~YOB
-+HouseholdStatus
-+EducationLevel
-+Q124122
-+Q120194
-+Q119334
-+Q118237
-+Q116953
-+Q116441
-+Q116197
-+Q115602
-+Q115899
-+Q115390
-+Q114961
-+Q114517
-+Q113584
-+Q111848
-+Q108342
-+Q107869
-+Q102674
-+Q102289
-+Q101162
-+Q101596
-+Q100680
+HappyLog.mod1<-glm(Happy~YOB+HouseholdStatus+EducationLevel+Q124122+Q120194+Q119334+Q118237+Q116953+Q116441
++Q116197+Q115602+Q115899+Q115390+Q114961+Q114517+Q113584+Q111848+Q108342+Q107869+Q102674+Q102289+Q101162+Q101596+Q100680
 +Q98197,data=train,family=binomial)
 
 summary(HappyLog.mod1)
 
 HappyLog.mod1_predictions<-predict(HappyLog.mod1,newdata=test,type="response")
+for(i in 1:length(HappyLog.mod1_predictions)){
+  if(is.na(HappyLog.mod1_predictions[i])==T){
+    HappyLog.mod1_predictions[i]<-sample(1:1000, 1)/1000
+  }
+}
 
 
-
-submission1 = data.frame(UserID = test$UserID, Probability1 = HappyLog.mod1_predictions)
-write.csv(submission1, "submission1.csv", row.names=FALSE) 
+submission2 = data.frame(UserID = test$UserID, Probability1 = HappyLog.mod1_predictions)
+write.csv(submission2, "submission2.csv", row.names=FALSE) 
 
 
 
