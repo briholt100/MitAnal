@@ -5,13 +5,17 @@ dir()
 train<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
 test<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
 str(train)
-dim(train)
-head(train)
+str(test)
 summary(train)
 dim(train)
-sumObj<-(summary(train[]))
-str(sumObj)
-sumObj[1,24]  #I believe generally at the end of every summary column, if there are NA's, they will be there.  
+
+#baesline train predcition of happy variable
+table(train$Happy)
+2604/(2015+2604)  #  0.5637584
+
+#sumObj<-(summary(train[]))
+#str(sumObj)
+#sumObj[1,24]  #I believe generally at the end of every summary column, if there are NA's, they will be there.  
 
 
 #create new variable, which is a sum of NA's
@@ -28,6 +32,58 @@ sumNA
 train$sumNA<-sumNA
 rm(sumNA)
 
+#create variable for test
+sumNA<-rep(0,nrow(test))
+for (i in 1:nrow(test)){
+  for(j in 1:ncol(test)){
+    if(is.na(test[i,j]) ==T) {
+      sumNA[i]<-sumNA[i]+1
+    }      
+  }
+}
+sumNA
+test$sumNA<-sumNA
+rm(sumNA)
+
+
+##convert YOB to int
+train$YOB<-as.numeric(train$YOB)
+test$YOB<-as.numeric(test$YOB)
+class(train$YOB)
+
+##reorder training Income
+table(train$Income)
+
+train$Income<-relevel(train$Income,ref="over $150,000")
+train$Income<-relevel(train$Income,ref="$100,001 - $150,000")
+train$Income<-relevel(train$Income,ref="$75,000 - $100,000")
+train$Income<-relevel(train$Income,ref="$50,000 - $74,999")
+train$Income<-relevel(train$Income,ref="$25,001 - $50,000")
+train$Income<-relevel(train$Income,ref="under $25,000")
+
+test$Income<-relevel(test$Income,ref="over $150,000")
+test$Income<-relevel(test$Income,ref="$100,001 - $150,000")
+test$Income<-relevel(test$Income,ref="$75,000 - $100,000")
+test$Income<-relevel(test$Income,ref="$50,000 - $74,999")
+test$Income<-relevel(test$Income,ref="$25,001 - $50,000")
+test$Income<-relevel(test$Income,ref="under $25,000")
+
+levels(train$EducationLevel)
+train$EducationLevel<-relevel(train$EducationLevel,ref="Current K-12")
+test$EducationLevel<-relevel(test$EducationLevel,ref="Current K-12")
+
+train$HouseholdStatus<-relevel(train$HouseholdStatus,ref="Single (no kids)")
+test$HouseholdStatus<-relevel(test$HouseholdStatus,ref="Single (no kids)")
+
+
+
+
+
+
+hist(as.numeric(train$Income),xlab=levels(train$income))
+#happy.by.incomeLog<-glm(Happy~Income,data=train,family=binomial)
+#summary(happy.by.incomeLog)
+boxplot(as.numeric(train$Income)~as.numeric(train$Happy))
 #be sure to evaluate the data for outliers.
 
 
@@ -42,19 +98,104 @@ for(i in 1:length(train)){plot(train[,i],xlab=colnames(train[i]))}
 par(mfrow = c(1,1))
 plot(train[,111])
 hist(train[,111])
+plot(train$sumNA,col=train$Gender)
+
+plot((train$Income))
+
+
+boxplot(train$sumNA~train$Happy)
+tapply(train$sumNA,as.factor(train$Happy),mean)
+boxplot(train$Happy~train[,111])
+
+boxplot(train[,110])
+
+cov(train,use="complete.obs")
+
 
 table(train$Happy,train$sumNA>=45)
 
-boxplot(train$Happy~train[,111]>60)
+
 
 ##all variables
-HappyLog<-lm(Happy~.,data=train,family="binomial")
-summary (HappyLog)
-#happyStep<-step(HappyLog)
-summary(happyStep)
+Happy.all.Log<-glm(Happy~. - UserID,data=train,family="binomial",na.action=na.omit)
+summary(Happy.all.Log)
+objects(Happy.all.Log)
+
+ss <- coef(summary(Happy.all.Log))
+head(ss)
+#Take only the rows you want:
+  ss_sig <- ss[ss[,"Pr(>|z|)"]<0.1,]
+rownames(ss_sig)
+
+HappyLog.mod1<-glm(Happy~YOB
++HouseholdStatus
++EducationLevel
++Q124122
++Q120194
++Q119334
++Q118237
++Q116953
++Q116441
++Q116197
++Q115602
++Q115899
++Q115390
++Q114961
++Q114517
++Q113584
++Q111848
++Q108342
++Q107869
++Q102674
++Q102289
++Q101162
++Q101596
++Q100680
++Q98197,data=train,family=binomial)
+
+summary(HappyLog.mod1)
+
+HappyLog.mod1_predictions<-predict(HappyLog.mod1,newdata=test,type="response")
+
+
+
+submission1 = data.frame(UserID = test$UserID, Probability1 = HappyLog.mod1_predictions)
+write.csv(submission1, "submission1.csv", row.names=FALSE) 
+
+
+
+table(test$Happy,HappyLog.mod1_predictions >= .5)
+overAll_accur<-(output[1,1]+output[2,2])/(sum(output))
+
+library(ROCR)
+ROCRpredict<-prediction(votlog_predictions,gerber$voting)
+ROCRperf<-performance(ROCRpredict, "tpr","fpr")
+auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#HappyStep<-step(HappyLog)
+summary(HappyStep)
+table(train$Q113181,train$Q98197)  #Important to exclude one or the other
+
+
+
 plot(train$YOB,train$Gender)
-cor(as.numeric(train$Q98197),as.numeric(train$Q113181),use="complete.obs",method="spearman") #mediate, pray
-summary(train)
+#cor(as.numeric(train$Q98197),as.numeric(train$Q113181),use="complete.obs",method="spearman") #mediate, pray
+
 
 #after step analysis
 Step:  AIC=-6307.43
