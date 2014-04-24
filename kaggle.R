@@ -1,3 +1,13 @@
+##Must change dataframe into integers for K-means and Hclust
+
+###########################
+#   Note about file names
+#   Kaggle_test & Kaggle_train are the original data from competition
+#   trainSource and testSource have had their data imputed down in this code..  
+###########################
+
+
+
 getwd()
 setwd("./mooc/MitAnalytic")
 setwd("./MitAnal")
@@ -65,6 +75,11 @@ trainSource[,2:109] = imputed
 summary(trainSource)
 write.csv(trainSource, "trainSource.csv", row.names=FALSE) 
 
+
+##################################################
+trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
+##################################################
+
 library(caTools)
 set.seed(1000)
 split<-sample.split(trainSource$Happy,SplitRatio = .7)
@@ -79,6 +94,8 @@ table(train$Happy)
 table(test$Happy)
 781/nrow(test)  #  0.563
 
+table(trainSource$Happy)
+2604/nrow(trainSource)
 #sumObj<-(summary(train[]))
 #str(sumObj)
 #sumObj[1,24]  #I believe generally at the end of every summary column, if there are NA's, they will be there.  
@@ -130,7 +147,47 @@ ss <- coef(summary(Happy.all.Log))
 head(ss)
 #Take only the rows you want:
   ss_sig <- ss[ss[,"Pr(>|z|)"]<0.1,]
-rownames(ss_sig)
+sigNames<-rownames(ss_sig)
+
+
+Happy.all.CART<-rpart(Happy~. - UserID,data=train)
+prp(Happy.all.CART)
+
+Happy.All.CART.Predict<-predict(Happy.all.CART,newdata=test)
+table(test$Happy,Happy.All.CART.Predict>=.5)
+(228+704)/(nrow(test))
+library(randomForest)
+Happy.all.RF<-randomForest(Happy~. - UserID,data=train)
+plot(Happy.all.RF)
+
+Happy.All.RF.Predict<-predict(Happy.all.RF,newdata=test)
+table(test$Happy,Happy.All.RF.Predict>=.5)
+(379+606)/(nrow(test))
+
+# Run k-means
+k=5
+set.seed(1000)
+KMC = kmeans(train[,-1], centers = k, iter.max = 100)
+str(KMC)
+
+# Extract clusters
+trainKclusters = KMC$cluster
+KMC$centers[1]
+
+train.by.Clust = split(train[,-1],trainKclusters)
+
+for (i in 1:k){print(nrow(train.by.Clust[[i]]))}  #gives count of each cluster
+
+
+for (i in 1:k){  #will show each clusters largest word's, sorted with largest at the tail
+  print (i)
+  print(tail(sort(colMeans(train.by.Clust[[i]]))))
+}
+
+
+
+
+
 
 
 HappyLog.mod1<-glm(Happy~YOB+HouseholdStatus+EducationLevel+Q124122+Q120194+Q119334+Q118237+Q116953+Q116441
@@ -138,6 +195,13 @@ HappyLog.mod1<-glm(Happy~YOB+HouseholdStatus+EducationLevel+Q124122+Q120194+Q119
 +Q98197,data=train,family=binomial)
 
 summary(HappyLog.mod1)
+
+library(rpart)
+library(rpart.plot)
+HappyCART.mod1<-rpart(Happy~YOB+HouseholdStatus+EducationLevel+Q124122+Q120194+Q119334+Q118237+Q116953+Q116441
+      +Q116197+Q115602+Q115899+Q115390+Q114961+Q114517+Q113584+Q111848+Q108342+Q107869+Q102674+Q102289+Q101162+Q101596+Q100680
+      +Q98197,data=train)
+prp(HappyCART.mod1)
 
 HappyLog.mod1_predictions<-predict(HappyLog.mod1,newdata=test,type="response")
 for(i in 1:length(HappyLog.mod1_predictions)){
@@ -189,14 +253,82 @@ objects(HappyLog.mod2)
 
 ###TRY STEP
 HappyLogMod2Step<-step(HappyLog.mod2)
-###gives an error, one suggestion is to remove NA from original data
+#Happy ~ YOB + HouseholdStatus + Q120194 + Q119334 + Q118237 + 
+#Q116441 + Q116197 + Q115390 + Q114961 + Q114386 + Q111848 + 
+ # Q108856 + Q107869 + Q102089 + Q101162 + Q100680 + Q99581 + 
+  #Q98869
+#
+################################################################################################
+################################################################################################
+testSource<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
+################################################################################################
+################################################################################################
 
-HappyLog.mod2_predictions<-predict.glm(HappyLog.mod2,newdata=test,type="response")
+sumNA<-rep(0,nrow(testSource))
+for (i in 1:nrow(testSource)){
+  for(j in 1:ncol(testSource)){
+    if(is.na(testSource[i,j]) ==T) {
+      sumNA[i]<-sumNA[i]+1
+    }      
+  }
+}
+#sumNA
+testSource$sumNA<-sumNA
+rm(sumNA)
+
+
+#create new variable, a ratio of $vote to # of Questions  VQ_ratio
+###1 varialbe has no NA's.  So, 109 questions.  Ratio will be $votes/109
+sort(testSource$votes/109)
+summary(testSource[1:9])  #7 variables not like the others
+testSource$VQ_ratio<-testSource$votes/109
+which(testSource$VQ_ratio<=.19)
+boxplot(log(testSource$VQ_ratio+1))
+##convert YOB to int
+
+install.packages("lubridate")
+library(lubridate)
+testSource$YOB<-as.Date(as.character(testSource$YOB),format="%Y")
+testSource$YOB<-year(testSource$YOB)
+table((testSource$YOB))
+old<-testSource$YOB<1936
+testSource[old,1:3]
+
+#####################################big issue with outliers here
+
+##reorder training Income
+#table(train$Income)
+
+testSource$Income<-relevel(testSource$Income,ref="over $150,000")
+testSource$Income<-relevel(testSource$Income,ref="$100,001 - $150,000")
+testSource$Income<-relevel(testSource$Income,ref="$75,000 - $100,000")
+testSource$Income<-relevel(testSource$Income,ref="$50,000 - $74,999")
+testSource$Income<-relevel(testSource$Income,ref="$25,001 - $50,000")
+testSource$Income<-relevel(testSource$Income,ref="under $25,000")
+
+levels(testSource$EducationLevel)
+testSource$EducationLevel<-relevel(testSource$EducationLevel,ref="Current K-12")
+
+testSource$HouseholdStatus<-relevel(testSource$HouseholdStatus,ref="Single (no kids)")
+
+
+
+summary(testSource)
+imputed = complete(mice(testSource[,2:109]))
+summary(imputed)
+testSource[,2:109] = imputed
+summary(testSource)
+write.csv(testSource, "testSource.csv", row.names=FALSE) 
+
+
+
+
+HappyLog.mod2_predictions<-predict.glm(HappyLog.mod2,newdata=testSource,type="response")
 
 output<-table(test$Happy,HappyLog.mod2_predictions >= .5)
-(74+142)/(74+38+44+142)
+(387+609)/(nrow(test))
 
-submission3 = data.frame(UserID = test$UserID, Probability1 = HappyLog.mod2_predictions)
+submission3 = data.frame(UserID = testSource$UserID, Probability1 = HappyLog.mod2_predictions)
 write.csv(submission3, "submission3.csv", row.names=FALSE) 
 
 
