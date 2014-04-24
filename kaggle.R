@@ -13,7 +13,7 @@ for (i in 1:nrow(trainSource)){
     }      
   }
 }
-sumNA
+#sumNA
 trainSource$sumNA<-sumNA
 rm(sumNA)
 
@@ -24,13 +24,17 @@ sort(trainSource$votes/109)
 summary(trainSource[1:9])  #7 variables not like the others
 trainSource$VQ_ratio<-trainSource$votes/109
 which(trainSource$VQ_ratio<=.19)
-
+boxplot(log(trainSource$VQ_ratio+1))
 ##convert YOB to int
+
 install.packages("lubridate")
 library(lubridate)
 trainSource$YOB<-as.Date(as.character(trainSource$YOB),format="%Y")
-year(trainSource$YOB)
-table(year(trainSource$YOB))
+trainSource$YOB<-year(trainSource$YOB)
+table((trainSource$YOB))
+old<-trainSource$YOB<1936
+trainSource[old,1:3]
+
 #####################################big issue with outliers here
 
 ##reorder training Income
@@ -47,6 +51,19 @@ levels(trainSource$EducationLevel)
 trainSource$EducationLevel<-relevel(trainSource$EducationLevel,ref="Current K-12")
 
 trainSource$HouseholdStatus<-relevel(trainSource$HouseholdStatus,ref="Single (no kids)")
+
+
+install.packages("mice")
+library(mice)
+
+# Multiple imputation
+#set.seed(144)
+summary(trainSource)
+imputed = complete(mice(trainSource[,2:109]))
+summary(imputed)
+trainSource[,2:109] = imputed
+summary(trainSource)
+write.csv(trainSource, "trainSource.csv", row.names=FALSE) 
 
 library(caTools)
 set.seed(1000)
