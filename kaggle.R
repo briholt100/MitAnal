@@ -10,9 +10,32 @@
 
 getwd()
 setwd("./mooc/MitAnalytic")
-setwd("./MitAnal")
+setwd("./MitAnal")  #dater
 dir()
-trainSource<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
+#trainSource<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
+
+
+##################################################
+trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
+##################################################
+
+library(caTools)
+set.seed(1000)
+split<-sample.split(trainSource$Happy,SplitRatio = .7)
+train<-subset(trainSource,split==T)
+test<-subset(trainSource,split==F)
+str(train)
+str(test)
+
+
+
+
+
+
+
+
+
+
 #create new variable, which is a sum of NA's
 
 sumNA<-rep(0,nrow(trainSource))
@@ -76,17 +99,6 @@ summary(trainSource)
 write.csv(trainSource, "trainSource.csv", row.names=FALSE) 
 
 
-##################################################
-trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
-##################################################
-
-library(caTools)
-set.seed(1000)
-split<-sample.split(trainSource$Happy,SplitRatio = .7)
-train<-subset(trainSource,split==T)
-test<-subset(trainSource,split==F)
-str(train)
-str(test)
 
 #baesline train predcition of happy variable
 table(train$Happy)
@@ -156,6 +168,8 @@ prp(Happy.all.CART)
 Happy.All.CART.Predict<-predict(Happy.all.CART,newdata=test)
 table(test$Happy,Happy.All.CART.Predict>=.5)
 (228+704)/(nrow(test))
+
+
 library(randomForest)
 Happy.all.RF<-randomForest(Happy~. - UserID,data=train)
 plot(Happy.all.RF)
@@ -163,30 +177,6 @@ plot(Happy.all.RF)
 Happy.All.RF.Predict<-predict(Happy.all.RF,newdata=test)
 table(test$Happy,Happy.All.RF.Predict>=.5)
 (379+606)/(nrow(test))
-
-# Run k-means
-k=5
-set.seed(1000)
-KMC = kmeans(train[,-1], centers = k, iter.max = 100)
-str(KMC)
-
-# Extract clusters
-trainKclusters = KMC$cluster
-KMC$centers[1]
-
-train.by.Clust = split(train[,-1],trainKclusters)
-
-for (i in 1:k){print(nrow(train.by.Clust[[i]]))}  #gives count of each cluster
-
-
-for (i in 1:k){  #will show each clusters largest word's, sorted with largest at the tail
-  print (i)
-  print(tail(sort(colMeans(train.by.Clust[[i]]))))
-}
-
-
-
-
 
 
 
@@ -320,8 +310,8 @@ testSource[,2:109] = imputed
 summary(testSource)
 write.csv(testSource, "testSource.csv", row.names=FALSE) 
 
-
-
+testSource<-read.csv("./data/testSource.csv",stringsAsFactors=T)
+trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
 
 HappyLog.mod2_predictions<-predict.glm(HappyLog.mod2,newdata=testSource,type="response")
 
@@ -345,6 +335,56 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 
 
 
+# Run k-means.  First load trainSource.csv which has imputed and made variables.  Split them using caTools into
+# train and test.  This code is up top.
+
+#convert train to integers or numeric? ########works as either numeric or integer
+#to convert factors into integers, you must first turn the characters.  No idea why.  
+###
+#Exclude UserID[,1], YOB[,2], Happy[,8],votes[,110], sumNA[,111],VQ_ratio[,112]
+####
+
+head(train[,c(1:2,8,110:112)])
+trainMatrix<-train[,c(3:7,9:109)]
+
+trainMatrix<-data.frame(as.numeric(as.character(trainMatrix)))
+# Compute distances
+distance = dist(trainMatrix, method = "euclidean")
+
+# Change the data type to matrix
+kosMatrix = as.matrix(kos)
+str(kosMatrix)
+
+# Turn matrix into a vector
+kosVector = as.vector(kosMatrix[,-1])
+str(kosVector)
+
+kosVector2 = as.vector(kos)
+str(kosVector2)
+
+# Compute distances
+distance = dist(kosMatrix[,-1], method = "euclidean")
+
+# Hierarchical clustering
+clusterIntensity = hclust(distance, method="ward.D")
+plot(clusterIntensity)
+
+k=7
+
+rect.hclust(clusterIntensity, k , border = "blue")
+kosClusters = cutree(clusterIntensity, k)
+head(kosClusters)
+
+tapply(kosMatrix,kosClusters,mean)
+table(kosClusters)
+
+kosClust1<-subset(kos,kosClusters == 1)
+kosClust2<-subset(kos,kosClusters == 2)
+kosClust3<-subset(kos,kosClusters == 3)
+kosClust4<-subset(kos,kosClusters == 4)
+kosClust5<-subset(kos,kosClusters == 5)
+kosClust6<-subset(kos,kosClusters == 6)
+kosClust7<-subset(kos,kosClusters == 7)
 
 
 
@@ -354,90 +394,35 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 
 
 
-#HappyStep<-step(HappyLog)
-summary(HappyStep)
-table(train$Q113181,train$Q98197)  #Important to exclude one or the other
 
 
 
-plot(train$YOB,train$Gender)
-#cor(as.numeric(train$Q98197),as.numeric(train$Q113181),use="complete.obs",method="spearman") #mediate, pray
+k=5
+set.seed(1000)
+KMC = kmeans(train[,-1], centers = k, iter.max = 100)
+str(KMC)
+
+# Extract clusters
+trainKclusters = KMC$cluster
+KMC$centers[1]
+
+train.by.Clust = split(train[,-1],trainKclusters)
+
+for (i in 1:k){print(nrow(train.by.Clust[[i]]))}  #gives count of each cluster
 
 
-#after step analysis
-Step:  AIC=-6307.43
-Happy ~ UserID + YOB + Gender + HouseholdStatus + Party + Q122769 + 
-  Q122770 + Q121700 + Q121011 + Q120194 + Q120012 + Q120014 + 
-  Q119334 + Q119650 + Q118237 + Q116797 + Q116441 + Q116197 + 
-  Q115777 + Q115610 + Q115611 + Q115899 + Q114961 + Q113992 + 
-  Q113583 + Q113584 + Q109367 + Q108855 + Q108617 + Q108754 + 
-  Q108342 + Q108343 + Q107869 + Q106388 + Q106389 + Q105655 + 
-  Q102906 + Q102674 + Q102687 + Q102289 + Q102089 + Q101162 + 
-  Q100680 + Q100562 + Q99982 + Q99716 + Q98869 + Q98197
-
-Df Sum of Sq    RSS     AIC
-- YOB              1    0.2273 752.36 -6308.2
-- Q105655          2    0.6172 752.75 -6308.2
-- Q106388          2    0.6288 752.77 -6308.1
-- UserID           1    0.2474 752.38 -6308.1
-- Gender           2    0.6545 752.79 -6308.0
-- Q115777          2    0.6690 752.81 -6307.9
-- Q108617          2    0.6871 752.82 -6307.8
-- Q113992          2    0.7194 752.86 -6307.7
-- Q119650          2    0.7610 752.90 -6307.5
-<none>                         752.14 -6307.4
-- Q109367          2    0.7991 752.94 -6307.3
-- Q108342          2    0.8077 752.95 -6307.2
-- Q102089          2    0.8192 752.96 -6307.1
-- Q116197          2    0.8526 752.99 -6307.0
-- Q121700          2    0.8599 753.00 -6306.9
-- Party            5    2.0188 754.16 -6306.9
-- Q115611          2    0.8767 753.01 -6306.8
-- Q122770          2    0.8980 753.04 -6306.7
-- Q98197           2    0.9289 753.07 -6306.6
-- Q120012          2    0.9472 753.08 -6306.5
-- Q116797          2    1.0027 753.14 -6306.2
-- Q113583          2    1.0473 753.18 -6306.0
-- Q115610          2    1.1452 753.28 -6305.4
-- Q108754          2    1.1498 753.29 -6305.4
-- Q108343          2    1.2223 753.36 -6305.0
-- Q100680          2    1.2351 753.37 -6305.0
-- Q99982           2    1.2879 753.43 -6304.7
-- Q99716           2    1.3007 753.44 -6304.6
-- Q113584          2    1.3356 753.47 -6304.4
-- Q106389          2    1.3641 753.50 -6304.3
-- Q114961          2    1.4081 753.55 -6304.1
-- Q108855          2    1.5085 753.65 -6303.5
-- Q122769          2    1.5211 753.66 -6303.5
-- Q102687          2    1.5717 753.71 -6303.2
-- Q100562          2    1.5753 753.71 -6303.2
-- Q102674          2    1.6541 753.79 -6302.8
-- Q120194          2    1.6762 753.81 -6302.7
-- Q121011          2    1.8120 753.95 -6302.0
-- Q115899          2    1.8348 753.97 -6301.8
-- Q102906          2    2.5727 754.71 -6298.0
-- Q116441          2    2.6007 754.74 -6297.8
-- Q98869           2    2.9507 755.09 -6296.0
-- Q120014          2    3.7092 755.85 -6292.1
-- HouseholdStatus  6    6.5860 758.72 -6285.1
-- Q119334          2    5.4842 757.62 -6282.8
-- Q102289          2    6.3137 758.45 -6278.5
-- Q107869          2    7.8908 760.03 -6270.4
-- Q101162          2   13.4887 765.63 -6241.5
-- Q118237          2   17.2440 769.38 -6222.2
-
-
-
-###lm of NA
-
-lmHappyNA<-glm(Happy~sumNA,data=train,family="binomial")
-summary(lmHappyNA)
+for (i in 1:k){  #will show each clusters largest word's, sorted with largest at the tail
+  print (i)
+  print(tail(sort(colMeans(train.by.Clust[[i]]))))
+}
 
 
 
 
 
-pisaTest <- na.omit(pisaTest)
-pisaTrain$raceeth = relevel(pisaTrain$raceeth, "White")
-pisaTest$raceeth = relevel(pisaTest$raceeth, "White")
+
+
+
+
+
 
