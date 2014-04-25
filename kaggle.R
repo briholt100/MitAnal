@@ -345,9 +345,9 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 ####
 
 head(train[,c(1:2,8,110:112)])
-trainMatrix<-train[,c(3:7,9:109)]
+trainMatrix<-as.matrix(train[,c(3:7,9:109)])
 
-trainMatrix<-data.frame(as.numeric(as.character(trainMatrix)))
+trainMatrix<-data.frame(as.integer(as.character(trainMatrix)))  #######this isn't working. NA's introduced by coersion
 # Compute distances
 distance = dist(trainMatrix, method = "euclidean")
 
