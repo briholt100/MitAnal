@@ -353,26 +353,14 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 
 
 head(train[,c(1:9,110:112)])
-trainMatrix<-data.matrix(train[,c(3:7,9:109)])
+trainMatrix<-data.matrix(train[,c(3:7,9:109)]) ###excludes Devependent variable and userID
 head(trainMatrix)
 str(trainMatrix)
 #trainMatrix$Gender<-as.numeric(levels(trainMatrix$Gender))[as.integer(trainMatrix$Gender)]
 #trainMatrix<-data.matrix(as.numeric(levels(trainMatrix)))  #######this isn't working. NA's introduced by coersion
 
-for (i in 1:ncol(trainMatrix)){
-  if(is.factor(trainMatrix[,i])==T){
-    trainMatrix[,i]<-as.numeric(as.character(trainMatrix[,i]))
-  }
-}
-
-
-str((trainMatrix))
 # Compute distances
 distance = dist(trainMatrix, method = "euclidean")
-
-# Change the data type to matrix
-kosMatrix = as.matrix(kos)
-str(kosMatrix)
 
 # Turn matrix into a vector
 kosVector = as.vector(kosMatrix[,-1])
@@ -388,44 +376,35 @@ distance = dist(kosMatrix[,-1], method = "euclidean")
 clusterIntensity = hclust(distance, method="ward.D")
 plot(clusterIntensity)
 
-k=7
+k=6
+rect.hclust(clusterIntensity, k , border = "red")
 
-rect.hclust(clusterIntensity, k , border = "blue")
-kosClusters = cutree(clusterIntensity, k)
-head(kosClusters)
+happyClusters = cutree(clusterIntensity, k)
+head(happyClusters)
+length(happyClusters)
+nrow(trainMatrix)
+tapply(train$Happy,happyClusters,sum)
+table(happyClusters)
 
-tapply(kosMatrix,kosClusters,mean)
-table(kosClusters)
-
-kosClust1<-subset(kos,kosClusters == 1)
-kosClust2<-subset(kos,kosClusters == 2)
-kosClust3<-subset(kos,kosClusters == 3)
-kosClust4<-subset(kos,kosClusters == 4)
-kosClust5<-subset(kos,kosClusters == 5)
-kosClust6<-subset(kos,kosClusters == 6)
-kosClust7<-subset(kos,kosClusters == 7)
-
-
-
+happyClust1<-subset(train,happyClusters == 1)
+happyClust2<-subset(train,happyClusters == 2)
+happyClust3<-subset(train,happyClusters == 3)
+happyClust4<-subset(train,happyClusters == 4)
+happyClust5<-subset(train,happyClusters == 5)
+happyClust6<-subset(train,happyClusters == 6)
+#shappyClust7<-subset(train,happyClusters == 7)
 
 
-
-
-
-
-
-
-
-k=5
+k=6
 set.seed(1000)
-KMC = kmeans(train[,-1], centers = k, iter.max = 100)
+KMC = kmeans(trainMatrix, centers = k, iter.max = 100)
 str(KMC)
 
 # Extract clusters
 trainKclusters = KMC$cluster
-KMC$centers[1]
+KMC$centers[2]
 
-train.by.Clust = split(train[,-1],trainKclusters)
+train.by.Clust = split(trainMatrix,trainKclusters)
 
 for (i in 1:k){print(nrow(train.by.Clust[[i]]))}  #gives count of each cluster
 
