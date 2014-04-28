@@ -18,15 +18,23 @@ dir()
 ##################################################
 trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
 ##################################################
+str(trainSource)
+s################################################################################################
+################################################################################################
+testSource<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
+################################################################################################
+################################################################################################
+
 
 library(caTools)
 set.seed(1000)
 split<-sample.split(trainSource$Happy,SplitRatio = .7)
 train<-subset(trainSource,split==T)
 test<-subset(trainSource,split==F)
+summary(train)
 str(train)
 str(test)
-
+summary(test)
 
 
 
@@ -248,11 +256,6 @@ HappyLogMod2Step<-step(HappyLog.mod2)
  # Q108856 + Q107869 + Q102089 + Q101162 + Q100680 + Q99581 + 
   #Q98869
 #
-################################################################################################
-################################################################################################
-testSource<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
-################################################################################################
-################################################################################################
 
 sumNA<-rep(0,nrow(testSource))
 for (i in 1:nrow(testSource)){
@@ -344,10 +347,26 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 #Exclude UserID[,1], YOB[,2], Happy[,8],votes[,110], sumNA[,111],VQ_ratio[,112]
 ####
 
-head(train[,c(1:2,8,110:112)])
-trainMatrix<-as.matrix(train[,c(3:7,9:109)])
+#as.numeric.factor <- function(x) {(as.numeric(levels(x)))[x]}
+#as.numeric(levels(train[,9]))[train[,9]]
 
-trainMatrix<-data.frame(as.integer(as.character(trainMatrix)))  #######this isn't working. NA's introduced by coersion
+
+
+head(train[,c(1:9,110:112)])
+trainMatrix<-data.matrix(train[,c(3:7,9:109)])
+head(trainMatrix)
+str(trainMatrix)
+#trainMatrix$Gender<-as.numeric(levels(trainMatrix$Gender))[as.integer(trainMatrix$Gender)]
+#trainMatrix<-data.matrix(as.numeric(levels(trainMatrix)))  #######this isn't working. NA's introduced by coersion
+
+for (i in 1:ncol(trainMatrix)){
+  if(is.factor(trainMatrix[,i])==T){
+    trainMatrix[,i]<-as.numeric(as.character(trainMatrix[,i]))
+  }
+}
+
+
+str((trainMatrix))
 # Compute distances
 distance = dist(trainMatrix, method = "euclidean")
 
@@ -415,14 +434,4 @@ for (i in 1:k){  #will show each clusters largest word's, sorted with largest at
   print (i)
   print(tail(sort(colMeans(train.by.Clust[[i]]))))
 }
-
-
-
-
-
-
-
-
-
-
 
