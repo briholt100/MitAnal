@@ -354,6 +354,7 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 
 head(train[,c(1:9,110:112)])
 trainMatrix<-data.matrix(train[,c(3:7,9:109)]) ###excludes Devependent variable and userID
+testMatrix<-data.matrix(test[,c(3:7,9:109)]) ###excludes Devependent variable and userID
 head(trainMatrix)
 str(trainMatrix)
 #trainMatrix$Gender<-as.numeric(levels(trainMatrix$Gender))[as.integer(trainMatrix$Gender)]
@@ -363,14 +364,14 @@ str(trainMatrix)
 distance = dist(trainMatrix, method = "euclidean")
 
 # Turn matrix into a vector
-kosVector = as.vector(kosMatrix[,-1])
-str(kosVector)
+#kosVector = as.vector(kosMatrix[,-1])
+#str(kosVector)
 
-kosVector2 = as.vector(kos)
-str(kosVector2)
+#kosVector2 = as.vector(kos)
+#str(kosVector2)
 
 # Compute distances
-distance = dist(kosMatrix[,-1], method = "euclidean")
+#distance = dist(kosMatrix[,-1], method = "euclidean")
 
 # Hierarchical clustering
 clusterIntensity = hclust(distance, method="ward.D")
@@ -383,30 +384,56 @@ happyClusters = cutree(clusterIntensity, k)
 head(happyClusters)
 length(happyClusters)
 nrow(trainMatrix)
-tapply(train$Happy,happyClusters,sum)
+tapply(train$Happy,happyClusters,mean)
 table(happyClusters)
 
+####
+###Make cluster subsets in both train and test
 happyClust1<-subset(train,happyClusters == 1)
 happyClust2<-subset(train,happyClusters == 2)
 happyClust3<-subset(train,happyClusters == 3)
 happyClust4<-subset(train,happyClusters == 4)
 happyClust5<-subset(train,happyClusters == 5)
 happyClust6<-subset(train,happyClusters == 6)
-#shappyClust7<-subset(train,happyClusters == 7)
 
+happyClust1.test<-subset(test,happyClusters == 1)
+happyClust2.test<-subset(test,happyClusters == 2)
+happyClust3.test<-subset(test,happyClusters == 3)
+happyClust4.test<-subset(test,happyClusters == 4)
+happyClust5.test<-subset(test,happyClusters == 5)
+happyClust6.test<-subset(test,happyClusters == 6)
+
+
+
+###Model using clustered training set.
+Happy.hclust.log1<-glm(Happy~Q118237+Q101162,data=happyClust1,family=binomial)
+Happy.hclust.log2<-glm(Happy~Q118237+Q101162,data=happyClust2,family=binomial)
+Happy.hclust.log3<-glm(Happy~Q118237+Q101162,data=happyClust3,family=binomial)
+Happy.hclust.log4<-glm(Happy~Q118237+Q101162,data=happyClust4,family=binomial)
+Happy.hclust.log5<-glm(Happy~Q118237+Q101162,data=happyClust5,family=binomial)
+Happy.hclust.log6<-glm(Happy~Q118237+Q101162,data=happyClust6,family=binomial)
+
+####
+#predictions  ###this doesn't work..wrong numbers of data points leads to NA's
+Pred.Happy.hclust.log1<-predict(Happy.hclust.log1,newdata=happyClust1.test)
+Pred.Happy.hclust.log2<-predict(Happy.hclust.log2,newdata=happyClust2.test)
+Pred.Happy.hclust.log3<-predict(Happy.hclust.log3,newdata=happyClust3.test)
+Pred.Happy.hclust.log4<-predict(Happy.hclust.log4,newdata=happyClust4.test)
+Pred.Happy.hclust.log5<-predict(Happy.hclust.log5,newdata=happyClust5.test)
+Pred.Happy.hclust.log6<-predict(Happy.hclust.log6,newdata=happyClust6.test)
 
 k=6
 set.seed(1000)
-KMC = kmeans(trainMatrix, centers = k, iter.max = 100)
+KMC = kmeans(trainMatrix, centers = k, iter.max = 1000)
 str(KMC)
 
 # Extract clusters
 trainKclusters = KMC$cluster
-KMC$centers[2]
+KMC$centers[6]
 
 train.by.Clust = split(trainMatrix,trainKclusters)
 
-for (i in 1:k){print(nrow(train.by.Clust[[i]]))}  #gives count of each cluster
+for (i in 1:k){print(mean(train.by.Clust[[i]]))}  #gives count of each cluster
 
 
 for (i in 1:k){  #will show each clusters largest word's, sorted with largest at the tail
