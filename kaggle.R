@@ -202,6 +202,17 @@ HappyCART.mod1<-rpart(Happy~YOB+HouseholdStatus+EducationLevel+Q124122+Q120194+Q
 prp(HappyCART.mod1)
 
 HappyLog.mod1_predictions<-predict(HappyLog.mod1,newdata=test,type="response")
+
+HappyLog.CART1_predictions<-predict(HappyCART.mod1,newdata=testSource)
+output<-table(test$Happy,HappyLog.CART1_predictions >= .5)
+(228+704)/(nrow(test))
+
+
+submission4 = data.frame(UserID = testSource$UserID, Probability1 = HappyLog.CART1_predictions)  #CART Model1
+write.csv(submission4, "submission4.csv", row.names=FALSE) 
+
+
+
 for(i in 1:length(HappyLog.mod1_predictions)){
   if(is.na(HappyLog.mod1_predictions[i])==T){
     HappyLog.mod1_predictions[i]<-sample(1:1000, 1)/1000
@@ -440,4 +451,70 @@ for (i in 1:k){  #will show each clusters largest word's, sorted with largest at
   print (i)
   print(tail(sort(colMeans(train.by.Clust[[i]]))))
 }
+
+
+
+
+# Extract clusters
+
+train.norm.Kclusters = KM$cluster  #associated cluster with observations.  length should equal data nrow
+KM$centers  #shows k-means clusters with varialbes
+lapply(split(train, KM$cluster), colMeans) #shows the cluster averages by non-normed data
+mean(train.norm$age)
+
+
+##3.5
+library(flexclust)
+
+km.kcca = as.kcca(KM, train.norm)
+
+cluster.train = predict(km.kcca)
+cluster.test = predict(km.kcca, newdata=test.norm)
+table(cluster.test)
+
+train1<-subset(train,cluster.train==1)
+train2<-subset(train,cluster.train==2)
+train3<-subset(train,cluster.train==3)
+
+mean(train1$reimbursement2009)
+mean(train2$reimbursement2009)
+mean(train3$reimbursement2009)
+
+trainClust.split = split(train, cluster.train)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
+trainClust.split[[1]]
+
+test1<-subset(test,cluster.test==1)
+test2<-subset(test,cluster.test==2)
+test3<-subset(test,cluster.test==3)
+
+
+lm1<-lm(reimbursement2009~.,train1)
+lm2<-lm(reimbursement2009~.,train2)
+lm3<-lm(reimbursement2009~.,train3)
+
+lm1$coef
+lm2$coef
+lm3$coef
+
+pred.test1<-predict(lm1,newdata=test1)
+pred.test2<-predict(lm2,newdata=test2)
+pred.test3<-predict(lm3,newdata=test3)
+
+mean(pred.test1)
+mean(pred.test2)
+mean(pred.test3)
+SSE<-sum((pred.test1-test1$reimbursement2009)^2)
+
+
+all.predictions = c(pred.test1, pred.test2, pred.test3)
+all.outcomes = c(test1$reimbursement2009, test2$reimbursement2009, test3$reimbursement2009)
+
+
+
+
+
+
+
+
+
 
