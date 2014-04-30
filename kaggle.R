@@ -366,6 +366,7 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 head(train[,c(1:9,110:112)])
 trainMatrix<-data.matrix(train[,c(3:7,9:109)]) ###excludes Devependent variable and userID
 testMatrix<-data.matrix(test[,c(3:7,9:109)]) ###excludes Devependent variable and userID
+
 head(trainMatrix)
 str(trainMatrix)
 #trainMatrix$Gender<-as.numeric(levels(trainMatrix$Gender))[as.integer(trainMatrix$Gender)]
@@ -466,19 +467,26 @@ mean(train.norm$age)
 ##3.5
 library(flexclust)
 
-km.kcca = as.kcca(KM, train.norm)
+km.kcca = as.kcca(KMC, trainMatrix)
 
 cluster.train = predict(km.kcca)
-cluster.test = predict(km.kcca, newdata=test.norm)
+cluster.test = predict(km.kcca, newdata=testMatrix)
 table(cluster.test)
 
 train1<-subset(train,cluster.train==1)
 train2<-subset(train,cluster.train==2)
 train3<-subset(train,cluster.train==3)
+train4<-subset(train,cluster.train==4)
+train5<-subset(train,cluster.train==5)
+train6<-subset(train,cluster.train==6)
 
-mean(train1$reimbursement2009)
-mean(train2$reimbursement2009)
-mean(train3$reimbursement2009)
+mean(train1$Happy)
+mean(train2$Happy)
+mean(train3$Happy)
+mean(train4$Happy)
+mean(train5$Happy)
+mean(train6$Happy)
+
 
 trainClust.split = split(train, cluster.train)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
 trainClust.split[[1]]
@@ -486,19 +494,25 @@ trainClust.split[[1]]
 test1<-subset(test,cluster.test==1)
 test2<-subset(test,cluster.test==2)
 test3<-subset(test,cluster.test==3)
+test4<-subset(test,cluster.test==4)
+test5<-subset(test,cluster.test==5)
+test6<-subset(test,cluster.test==6)
 
+lm1<-glm(Happy~.,train1,family="binomial")
+lm2<-glm(Happy~.,train2,family="binomial")
+lm3<-glm(Happy~.,train3,family="binomial")
+lm4<-glm(Happy~.,train4,family="binomial")
+lm5<-glm(Happy~.,train5,family="binomial")
+lm6<-glm(Happy~.,train6,family="binomial")
+summary(lm6)
 
-lm1<-lm(reimbursement2009~.,train1)
-lm2<-lm(reimbursement2009~.,train2)
-lm3<-lm(reimbursement2009~.,train3)
-
-lm1$coef
-lm2$coef
-lm3$coef
 
 pred.test1<-predict(lm1,newdata=test1)
 pred.test2<-predict(lm2,newdata=test2)
 pred.test3<-predict(lm3,newdata=test3)
+pred.test4<-predict(lm3,newdata=test4)
+pred.test5<-predict(lm3,newdata=test5)
+pred.test6<-predict(lm3,newdata=test6)
 
 mean(pred.test1)
 mean(pred.test2)
