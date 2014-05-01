@@ -505,7 +505,7 @@ for (i in 1:k){  #will show each clusters largest word's, sorted with largest at
 train.norm.Kclusters = KMC$cluster  #associated cluster with observations.  length should equal data nrow
 KMC$centers  #shows k-means clusters with varialbes
 lapply(split(train, KMC$cluster), colMeans) #shows the cluster averages by non-normed data
-mean(train.norm$age)
+mean(train.norm$Happy)
 
 
 ##3.5
@@ -535,8 +535,6 @@ mean(train1$Happy)
 mean(train2$Happy)
 mean(train3$Happy)
 mean(train4$Happy)
-mean(train5$Happy)
-mean(train6$Happy)
 
 
 trainClust.split = split(train, cluster.train)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
@@ -557,10 +555,10 @@ lm4<-glm(Happy~.,train4,family="binomial")
 
 
 
-pred.test1<-predict(lm1,newdata=test1)
-pred.test2<-predict(lm2,newdata=test2)
-pred.test3<-predict(lm3,newdata=test3)
-pred.test4<-predict(lm3,newdata=test4)
+pred.test1<-predict(lm1,newdata=test1,type="response")
+pred.test2<-predict(lm2,newdata=test2,type="response")
+pred.test3<-predict(lm3,newdata=test3,type="response")
+pred.test4<-predict(lm3,newdata=test4,type="response")
 #pred.test5<-predict(lm3,newdata=test5)
 #pred.test6<-predict(lm3,newdata=test6)
 
