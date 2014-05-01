@@ -1,5 +1,3 @@
-###Must add VQ_ratio to testSource
-
 ###########################
 #   Note about file names
 #   Kaggle_test & Kaggle_train are the original data from competition
@@ -489,7 +487,7 @@ plot(svd1$v[,9],pch=19,xlab="Column",ylab="Second right singluar vector")
 plot(svd1$v[,10],pch=19,xlab="Column",ylab="Second right singluar vector")
 
 approx10 <- svd1$u[,1:10] %*% diag(svd1$d[1:10])%*% t(svd1$v[,1:10])
-
+heatmap(approx10)
 
 
 # Turn matrix into a vector
