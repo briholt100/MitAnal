@@ -219,6 +219,19 @@ Happy.All.CART.Predict<-predict(Happy.all.CART,newdata=test)
 table(test$Happy,Happy.All.CART.Predict>=.5)
 (228+704)/(nrow(test))
 
+Happy.svd.CART<-rpart(Happy~Q108754+
+                        YOB+Q108342+votes+
+                        sumNA+Q108950+Q106993+
+                        Q109367+Q117186+Q108856,data=train)
+
+prp(Happy.svd.CART)
+Happy.svd.CART.Predict<-predict(Happy.svd.CART,newdata=test)
+
+
+table(test$Happy,Happy.svd.CART.Predict>=.5)
+(218+570)/(nrow(test)) #.568
+
+
 
 library(randomForest)
 Happy.all.RF<-randomForest(Happy~. - UserID,data=train)
@@ -226,8 +239,8 @@ plot(Happy.all.RF)
 
 Happy.All.RF.Predict<-predict(Happy.all.RF,newdata=test)
 table(test$Happy,Happy.All.RF.Predict>=.5)
-(379+606)/(nrow(test))
-
+(379+606)/(nrow(test)) #.71
+(378+603)/(nrow(test)) #.707
 
 
 HappyLog.mod1<-glm(Happy~YOB+HouseholdStatus+EducationLevel+Q124122+Q120194+Q119334+Q118237+Q116953+Q116441
@@ -413,6 +426,71 @@ summary(testSourceMatrix)
 
 # Compute distances
 distance = dist(trainMatrix, method = "euclidean")
+heatmap(trainMatrix)
+plot(rowMeans(trainMatrix),,xlab="Row",ylab="Row Mean",pch=19)
+plot(colMeans(trainMatrix),xlab="Column",ylab="Column Mean",pch=19)
+
+svd1 <- svd(scale(trainMatrix))
+which.max(svd1$v[,10])
+colnames(train[72])
+> colnames(train[73])
+[1] "Q108754"
+> colnames(train[1])
+[1] "UserID"
+> colnames(train[2])
+[1] "YOB"
+> colnames(train[74])
+[1] "Q108342"
+> maxContrib
+[1] 109
+> colnames(train[110])
+[1] "votes"
+> maxContrib <- which.max(svd1$v[,4])
+> maxContrib
+[1] 110
+> colnames(train[111])
+[1] "sumNA"
+> which.max(svd1$v[,4])
+[1] 110
+> which.max(svd1$v[,5])
+[1] 110
+> which.max(svd1$v[,6])
+[1] 67
+> colnames(train[68])
+[1] "Q108950"
+> which.max(svd1$v[,7])
+[1] 77
+> colnames(train[78])
+[1] "Q106993"
+> which.max(svd1$v[,8])
+[1] 66
+> colnames(train[67])
+[1] "Q109367"
+> which.max(svd1$v[,9])
+[1] 34
+> colnames(train[35])
+[1] "Q117186"
+> which.max(svd1$v[,10])
+[1] 71
+> colnames(train[72])
+[1] "Q108856"
+
+plot(svd1$d,xlab="Column",ylab="Singluar value",pch=19)
+plot(svd1$d^2/sum(svd1$d^2),xlab="Column",ylab="Percent of variance explained",pch=19)
+plot(svd1$v[,1],pch=19,xlab="Column",ylab="First right singluar vector")
+plot(svd1$v[,2],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,3],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,4],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,5],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,6],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,7],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,8],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,9],pch=19,xlab="Column",ylab="Second right singluar vector")
+plot(svd1$v[,10],pch=19,xlab="Column",ylab="Second right singluar vector")
+
+approx10 <- svd1$u[,1:10] %*% diag(svd1$d[1:10])%*% t(svd1$v[,1:10])
+
+
 
 # Turn matrix into a vector
 #kosVector = as.vector(kosMatrix[,-1])
@@ -428,7 +506,7 @@ distance = dist(trainMatrix, method = "euclidean")
 clusterIntensity = hclust(distance, method="ward.D")
 plot(clusterIntensity)
 
-k=4
+k=8
 rect.hclust(clusterIntensity, k , border = "blue")
 
 happyClusters = cutree(clusterIntensity, k)
@@ -444,36 +522,42 @@ happyClust1<-subset(train,happyClusters == 1)
 happyClust2<-subset(train,happyClusters == 2)
 happyClust3<-subset(train,happyClusters == 3)
 happyClust4<-subset(train,happyClusters == 4)
-#happyClust5<-subset(train,happyClusters == 5)
-#happyClust6<-subset(train,happyClusters == 6)
+happyClust5<-subset(train,happyClusters == 5)
+happyClust6<-subset(train,happyClusters == 6)
+happyClust7<-subset(train,happyClusters == 7)
+happyClust8<-subset(train,happyClusters == 8)
 
 happyClust1.test<-subset(testSource,happyClusters == 1)
 happyClust2.test<-subset(testSource,happyClusters == 2)
 happyClust3.test<-subset(testSource,happyClusters == 3)
 happyClust4.test<-subset(testSource,happyClusters == 4)
-#happyClust5.test<-subset(test,happyClusters == 5)
-#happyClust6.test<-subset(test,happyClusters == 6)
-
-
+happyClust5.test<-subset(testSource,happyClusters == 5)
+happyClust6.test<-subset(testSource,happyClusters == 6)
+happyClust7.test<-subset(testSource,happyClusters == 7)
+happyClust8.test<-subset(testSource,happyClusters == 8)
+nrow(happyClust7.test)
 
 ###Model using clustered training set.
 Happy.hclust.log1<-glm(Happy~Q118237+Q101162,data=happyClust1,family=binomial)
 Happy.hclust.log2<-glm(Happy~Q118237+Q101162,data=happyClust2,family=binomial)
 Happy.hclust.log3<-glm(Happy~Q118237+Q101162,data=happyClust3,family=binomial)
 Happy.hclust.log4<-glm(Happy~Q118237+Q101162,data=happyClust4,family=binomial)
-#Happy.hclust.log5<-glm(Happy~Q118237+Q101162,data=happyClust5,family=binomial)
-#Happy.hclust.log6<-glm(Happy~Q118237+Q101162,data=happyClust6,family=binomial)
-
+Happy.hclust.log5<-glm(Happy~Q118237+Q101162,data=happyClust5,family=binomial)
+Happy.hclust.log6<-glm(Happy~Q118237+Q101162,data=happyClust6,family=binomial)
+Happy.hclust.log7<-glm(Happy~Q118237+Q101162,data=happyClust7,family=binomial)
+Happy.hclust.log8<-glm(Happy~Q118237+Q101162,data=happyClust8,family=binomial)
 ####
 
-Pred.Happy.hclust.log1<-predict(Happy.hclust.log1,newdata=happyClust1.test)
-Pred.Happy.hclust.log2<-predict(Happy.hclust.log2,newdata=happyClust2.test)
-Pred.Happy.hclust.log3<-predict(Happy.hclust.log3,newdata=happyClust3.test)
-Pred.Happy.hclust.log4<-predict(Happy.hclust.log4,newdata=happyClust4.test)
-#Pred.Happy.hclust.log5<-predict(Happy.hclust.log5,newdata=happyClust5.test)
-#Pred.Happy.hclust.log6<-predict(Happy.hclust.log6,newdata=happyClust6.test)
+Pred.Happy.hclust.log1<-predict(Happy.hclust.log1,newdata=happyClust1.test,type="response")
+Pred.Happy.hclust.log2<-predict(Happy.hclust.log2,newdata=happyClust2.test,type="response")
+Pred.Happy.hclust.log3<-predict(Happy.hclust.log3,newdata=happyClust3.test,type="response")
+Pred.Happy.hclust.log4<-predict(Happy.hclust.log4,newdata=happyClust4.test,type="response")
+Pred.Happy.hclust.log5<-predict(Happy.hclust.log5,newdata=happyClust5.test,type="response")
+Pred.Happy.hclust.log6<-predict(Happy.hclust.log6,newdata=happyClust6.test,type="response")
+Pred.Happy.hclust.log7<-predict(Happy.hclust.log7,newdata=happyClust7.test,type="response")
 
-all.predictions = c(Pred.Happy.hclust.log1, Pred.Happy.hclust.log2, Pred.Happy.hclust.log3,Pred.Happy.hclust.log4)
+all.predictions = c(Pred.Happy.hclust.log1, Pred.Happy.hclust.log2, Pred.Happy.hclust.log3,Pred.Happy.hclust.log4,
+                    Pred.Happy.hclust.log5,Pred.Happy.hclust.log6,Pred.Happy.hclust.log7)
 length(all.predictions)
 
 
