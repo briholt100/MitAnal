@@ -1,4 +1,4 @@
-##Must change dataframe into integers for K-means and Hclust
+###Must add VQ_ratio to testSource
 
 ###########################
 #   Note about file names
@@ -21,28 +21,10 @@ trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
 str(trainSource)
 s################################################################################################
 ################################################################################################
-testSource<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
+testSource<-read.csv("./data/testSource.csv",na.strings="",stringsAsFactors=T)
 ################################################################################################
 ################################################################################################
-
-
-library(caTools)
-set.seed(1000)
-split<-sample.split(trainSource$Happy,SplitRatio = .7)
-train<-subset(trainSource,split==T)
-test<-subset(trainSource,split==F)
-summary(train)
-str(train)
-str(test)
-summary(test)
-
-
-
-
-
-
-
-
+str(testSource)
 
 #create new variable, which is a sum of NA's
 
@@ -59,6 +41,20 @@ trainSource$sumNA<-sumNA
 rm(sumNA)
 
 
+sumNA<-rep(0,nrow(testSource))
+for (i in 1:nrow(testSource)){
+  for(j in 1:ncol(testSource)){
+    if(is.na(testSource[i,j]) ==T) {
+      sumNA[i]<-sumNA[i]+1
+    }      
+  }
+}
+#sumNA
+testSource$sumNA<-sumNA
+rm(sumNA)
+
+
+
 #create new variable, a ratio of $vote to # of Questions  VQ_ratio
 ###1 varialbe has no NA's.  So, 109 questions.  Ratio will be $votes/109
 sort(trainSource$votes/109)
@@ -67,14 +63,26 @@ trainSource$VQ_ratio<-trainSource$votes/109
 which(trainSource$VQ_ratio<=.19)
 boxplot(log(trainSource$VQ_ratio+1))
 ##convert YOB to int
+testSource$VQ_ratio<-testSource$votes/109
 
-install.packages("lubridate")
+
+
+
+#install.packages("lubridate")
 library(lubridate)
 trainSource$YOB<-as.Date(as.character(trainSource$YOB),format="%Y")
 trainSource$YOB<-year(trainSource$YOB)
 table((trainSource$YOB))
 old<-trainSource$YOB<1936
 trainSource[old,1:3]
+
+testSource$YOB<-as.Date(as.character(testSource$YOB),format="%Y")
+testSource$YOB<-year(testSource$YOB)
+
+
+
+
+
 
 #####################################big issue with outliers here
 
@@ -90,8 +98,20 @@ trainSource$Income<-relevel(trainSource$Income,ref="under $25,000")
 
 levels(trainSource$EducationLevel)
 trainSource$EducationLevel<-relevel(trainSource$EducationLevel,ref="Current K-12")
-
 trainSource$HouseholdStatus<-relevel(trainSource$HouseholdStatus,ref="Single (no kids)")
+#######for testSource
+testSource$Income<-relevel(testSource$Income,ref="over $150,000")
+testSource$Income<-relevel(testSource$Income,ref="$100,001 - $150,000")
+testSource$Income<-relevel(testSource$Income,ref="$75,000 - $100,000")
+testSource$Income<-relevel(testSource$Income,ref="$50,000 - $74,999")
+testSource$Income<-relevel(testSource$Income,ref="$25,001 - $50,000")
+testSource$Income<-relevel(testSource$Income,ref="under $25,000")
+
+levels(testSource$EducationLevel)
+testSource$EducationLevel<-relevel(testSource$EducationLevel,ref="Current K-12")
+testSource$HouseholdStatus<-relevel(testSource$HouseholdStatus,ref="Single (no kids)")
+
+
 
 
 install.packages("mice")
@@ -105,6 +125,28 @@ summary(imputed)
 trainSource[,2:109] = imputed
 summary(trainSource)
 write.csv(trainSource, "trainSource.csv", row.names=FALSE) 
+
+#for testSource
+imputed = complete(mice(testSource[,2:109]))
+summary(imputed)
+testSource[,2:109] = imputed
+summary(testSource)
+write.csv(testSource, "testSource.csv", row.names=FALSE) 
+
+
+
+library(caTools)
+set.seed(1000)
+split<-sample.split(trainSource$Happy,SplitRatio = .7)
+train<-subset(trainSource,split==T)
+test<-subset(trainSource,split==F)
+summary(train)
+str(train)
+str(test)
+summary(test)
+
+
+
 
 
 
@@ -268,17 +310,6 @@ HappyLogMod2Step<-step(HappyLog.mod2)
   #Q98869
 #
 
-sumNA<-rep(0,nrow(testSource))
-for (i in 1:nrow(testSource)){
-  for(j in 1:ncol(testSource)){
-    if(is.na(testSource[i,j]) ==T) {
-      sumNA[i]<-sumNA[i]+1
-    }      
-  }
-}
-#sumNA
-testSource$sumNA<-sumNA
-rm(sumNA)
 
 
 #create new variable, a ratio of $vote to # of Questions  VQ_ratio
@@ -364,13 +395,21 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 
 
 head(train[,c(1:9,110:112)])
-trainMatrix<-data.matrix(train[,c(3:7,9:109)]) ###excludes Devependent variable and userID
-testMatrix<-data.matrix(test[,c(3:7,9:109)]) ###excludes Devependent variable and userID
+trainMatrix<-data.matrix(train[,c(2:7,9:112)]) ###excludes Devependent variable and userID
+testMatrix<-data.matrix(test[,c(2:7,9:112)]) ###excludes Devependent variable and userID
+testSourceMatrix<-data.matrix(testSource[,c(2:111)]) ###excludes Devependent variable and userID
 
-head(trainMatrix)
-str(trainMatrix)
-#trainMatrix$Gender<-as.numeric(levels(trainMatrix$Gender))[as.integer(trainMatrix$Gender)]
-#trainMatrix<-data.matrix(as.numeric(levels(trainMatrix)))  #######this isn't working. NA's introduced by coersion
+####The following is an attempt to make sure testSourceMatrix has same # of variables as train
+####IF they are equal, then there will be an error.  If the colnames are off, you'll see the first problem.
+for (i in 1:ncol(trainMatrix)){
+  if(colnames(trainMatrix[i])==colnames(testSourceMatrix[i])){print(T)} else{print(colnames(trainMatrix[i]))}
+}
+
+dim(trainMatrix)
+dim(testMatrix)
+dim(testSourceMatrix)
+summary(testSourceMatrix)
+
 
 # Compute distances
 distance = dist(trainMatrix, method = "euclidean")
@@ -389,8 +428,8 @@ distance = dist(trainMatrix, method = "euclidean")
 clusterIntensity = hclust(distance, method="ward.D")
 plot(clusterIntensity)
 
-k=6
-rect.hclust(clusterIntensity, k , border = "red")
+k=4
+rect.hclust(clusterIntensity, k , border = "blue")
 
 happyClusters = cutree(clusterIntensity, k)
 head(happyClusters)
@@ -405,15 +444,15 @@ happyClust1<-subset(train,happyClusters == 1)
 happyClust2<-subset(train,happyClusters == 2)
 happyClust3<-subset(train,happyClusters == 3)
 happyClust4<-subset(train,happyClusters == 4)
-happyClust5<-subset(train,happyClusters == 5)
-happyClust6<-subset(train,happyClusters == 6)
+#happyClust5<-subset(train,happyClusters == 5)
+#happyClust6<-subset(train,happyClusters == 6)
 
-happyClust1.test<-subset(test,happyClusters == 1)
-happyClust2.test<-subset(test,happyClusters == 2)
-happyClust3.test<-subset(test,happyClusters == 3)
-happyClust4.test<-subset(test,happyClusters == 4)
-happyClust5.test<-subset(test,happyClusters == 5)
-happyClust6.test<-subset(test,happyClusters == 6)
+happyClust1.test<-subset(testSource,happyClusters == 1)
+happyClust2.test<-subset(testSource,happyClusters == 2)
+happyClust3.test<-subset(testSource,happyClusters == 3)
+happyClust4.test<-subset(testSource,happyClusters == 4)
+#happyClust5.test<-subset(test,happyClusters == 5)
+#happyClust6.test<-subset(test,happyClusters == 6)
 
 
 
@@ -422,30 +461,35 @@ Happy.hclust.log1<-glm(Happy~Q118237+Q101162,data=happyClust1,family=binomial)
 Happy.hclust.log2<-glm(Happy~Q118237+Q101162,data=happyClust2,family=binomial)
 Happy.hclust.log3<-glm(Happy~Q118237+Q101162,data=happyClust3,family=binomial)
 Happy.hclust.log4<-glm(Happy~Q118237+Q101162,data=happyClust4,family=binomial)
-Happy.hclust.log5<-glm(Happy~Q118237+Q101162,data=happyClust5,family=binomial)
-Happy.hclust.log6<-glm(Happy~Q118237+Q101162,data=happyClust6,family=binomial)
+#Happy.hclust.log5<-glm(Happy~Q118237+Q101162,data=happyClust5,family=binomial)
+#Happy.hclust.log6<-glm(Happy~Q118237+Q101162,data=happyClust6,family=binomial)
 
 ####
-#predictions  ###this doesn't work..wrong numbers of data points leads to NA's
+
 Pred.Happy.hclust.log1<-predict(Happy.hclust.log1,newdata=happyClust1.test)
 Pred.Happy.hclust.log2<-predict(Happy.hclust.log2,newdata=happyClust2.test)
 Pred.Happy.hclust.log3<-predict(Happy.hclust.log3,newdata=happyClust3.test)
 Pred.Happy.hclust.log4<-predict(Happy.hclust.log4,newdata=happyClust4.test)
-Pred.Happy.hclust.log5<-predict(Happy.hclust.log5,newdata=happyClust5.test)
-Pred.Happy.hclust.log6<-predict(Happy.hclust.log6,newdata=happyClust6.test)
+#Pred.Happy.hclust.log5<-predict(Happy.hclust.log5,newdata=happyClust5.test)
+#Pred.Happy.hclust.log6<-predict(Happy.hclust.log6,newdata=happyClust6.test)
 
-k=6
+all.predictions = c(Pred.Happy.hclust.log1, Pred.Happy.hclust.log2, Pred.Happy.hclust.log3,Pred.Happy.hclust.log4)
+length(all.predictions)
+
+
+
+k=4
 set.seed(1000)
 KMC = kmeans(trainMatrix, centers = k, iter.max = 1000)
 str(KMC)
 
 # Extract clusters
 trainKclusters = KMC$cluster
-KMC$centers[6]
+KMC$centers
 
 train.by.Clust = split(trainMatrix,trainKclusters)
 
-for (i in 1:k){print(mean(train.by.Clust[[i]]))}  #gives count of each cluster
+for (i in 1:k){print(sum(train.by.Clust[[i]]))}  #gives count of each cluster
 
 
 for (i in 1:k){  #will show each clusters largest word's, sorted with largest at the tail
@@ -458,27 +502,34 @@ for (i in 1:k){  #will show each clusters largest word's, sorted with largest at
 
 # Extract clusters
 
-train.norm.Kclusters = KM$cluster  #associated cluster with observations.  length should equal data nrow
-KM$centers  #shows k-means clusters with varialbes
-lapply(split(train, KM$cluster), colMeans) #shows the cluster averages by non-normed data
+train.norm.Kclusters = KMC$cluster  #associated cluster with observations.  length should equal data nrow
+KMC$centers  #shows k-means clusters with varialbes
+lapply(split(train, KMC$cluster), colMeans) #shows the cluster averages by non-normed data
 mean(train.norm$age)
 
 
 ##3.5
 library(flexclust)
 
+dim(trainMatrix) = c(nrow(trainMatrix), ncol(trainMatrix))
+dim(testMatrix) = c(nrow(testMatrix), ncol(testMatrix))
+dim(testSourceMatrix) = c(nrow(testSourceMatrix), ncol(testSourceMatrix))
+
+
 km.kcca = as.kcca(KMC, trainMatrix)
 
 cluster.train = predict(km.kcca)
-cluster.test = predict(km.kcca, newdata=testMatrix)
+cluster.test = predict(km.kcca, newdata=testSourceMatrix)
+table(cluster.train)
 table(cluster.test)
 
+################
 train1<-subset(train,cluster.train==1)
 train2<-subset(train,cluster.train==2)
 train3<-subset(train,cluster.train==3)
 train4<-subset(train,cluster.train==4)
-train5<-subset(train,cluster.train==5)
-train6<-subset(train,cluster.train==6)
+#train5<-subset(train,cluster.train==5)
+#train6<-subset(train,cluster.train==6)
 
 mean(train1$Happy)
 mean(train2$Happy)
@@ -491,37 +542,42 @@ mean(train6$Happy)
 trainClust.split = split(train, cluster.train)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
 trainClust.split[[1]]
 
-test1<-subset(test,cluster.test==1)
-test2<-subset(test,cluster.test==2)
-test3<-subset(test,cluster.test==3)
-test4<-subset(test,cluster.test==4)
-test5<-subset(test,cluster.test==5)
-test6<-subset(test,cluster.test==6)
+test1<-subset(testSource,cluster.test==1)
+test2<-subset(testSource,cluster.test==2)
+test3<-subset(testSource,cluster.test==3)
+test4<-subset(testSource,cluster.test==4)
 
 lm1<-glm(Happy~.,train1,family="binomial")
 lm2<-glm(Happy~.,train2,family="binomial")
 lm3<-glm(Happy~.,train3,family="binomial")
 lm4<-glm(Happy~.,train4,family="binomial")
-lm5<-glm(Happy~.,train5,family="binomial")
-lm6<-glm(Happy~.,train6,family="binomial")
-summary(lm6)
+
+#lm5<-glm(Happy~.,train5,family="binomial")
+#lm6<-glm(Happy~.,train6,family="binomial")
+
 
 
 pred.test1<-predict(lm1,newdata=test1)
 pred.test2<-predict(lm2,newdata=test2)
 pred.test3<-predict(lm3,newdata=test3)
 pred.test4<-predict(lm3,newdata=test4)
-pred.test5<-predict(lm3,newdata=test5)
-pred.test6<-predict(lm3,newdata=test6)
+#pred.test5<-predict(lm3,newdata=test5)
+#pred.test6<-predict(lm3,newdata=test6)
 
 mean(pred.test1)
 mean(pred.test2)
 mean(pred.test3)
+mean(pred.test4)
 SSE<-sum((pred.test1-test1$reimbursement2009)^2)
 
 
-all.predictions = c(pred.test1, pred.test2, pred.test3)
-all.outcomes = c(test1$reimbursement2009, test2$reimbursement2009, test3$reimbursement2009)
+all.predictions = c(pred.test1, pred.test2, pred.test3,pred.test4)
+length(all.predictions)
+
+submission5 = data.frame(UserID = testSource$UserID, Probability1 = all.predictions)  #CART Model1
+write.csv(submission5, "submission5.csv", row.names=FALSE) 
+
+head(submission5)
 
 
 
