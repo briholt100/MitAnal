@@ -1,3 +1,23 @@
+#http://www.r-statistics.com/2013/08/k-means-clustering-from-r-in-action/#more-61075
+
+library(MASS)
+data(crabs)
+data(crabsgp)
+str(crabs)
+brks<-quantile(crabs$BD,probs=seq(0,1,.2))
+range(crabs$BD)
+nrow(crabs)
+table(cut(crabs$BD, breaks<-c(0,11,14,15,18,22), dig.lab=4))
+
+grp<-(cut(crabs$BD, breaks<-c(0,11,14,15,18,22), dig.lab=4))
+cases<-table(grp)
+avgBD<-tapply(crabs$BD,grp,mean)
+
+#http://web.stat.ufl.edu/~presnell/Courses/sta4504-2000sp/R/R-CDA.pdf
+#see pg 19, 20 for "wegith" "offset" "cases"
+
+
+
 ###########################
 #   Note about file names
 #   Kaggle_test & Kaggle_train are the original data from competition

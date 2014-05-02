@@ -1,6 +1,6 @@
 # Week 6 - Recitation
 getwd()
-setwd("./MitAnal")
+setwd("./mooc/MitAnal")
 
 # Video 2
 
