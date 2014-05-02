@@ -31,18 +31,7 @@ setwd("./mooc/MitAnalytic")
 setwd("./MitAnal")  #dater
 dir()
 #trainSource<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
-
-
-##################################################
-trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
-##################################################
-str(trainSource)
-s################################################################################################
-################################################################################################
-testSource<-read.csv("./data/testSource.csv",na.strings="",stringsAsFactors=T)
-################################################################################################
-################################################################################################
-str(testSource)
+#testSource<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
 
 #create new variable, which is a sum of NA's
 
@@ -90,19 +79,29 @@ testSource$VQ_ratio<-testSource$votes/109
 library(lubridate)
 trainSource$YOB<-as.Date(as.character(trainSource$YOB),format="%Y")
 trainSource$YOB<-year(trainSource$YOB)
-table((trainSource$YOB))
-old<-trainSource$YOB<1936
-trainSource[old,1:3]
-
 testSource$YOB<-as.Date(as.character(testSource$YOB),format="%Y")
 testSource$YOB<-year(testSource$YOB)
+table((trainSource$YOB))
+table((testSource$YOB))
 
+for(i in 1:length(trainSource$YOB)){
+  if (!is.na(trainSource$YOB[i])){
+    if(trainSource$YOB[i] < 1931 | trainSource$YOB[i]>2001) {
+      trainSource$YOB[i]<-NA
+      print(trainSource$YOB[i])
+    }
+  }
+}
 
+for(i in 1:length(testSource$YOB)){
+  if (!is.na(testSource$YOB[i])){
+    if(testSource$YOB[i] < 1931 | testSource$YOB[i]>2001) {
+      testSource$YOB[i]<-NA
+      print(testSource$YOB[i])
+    }
+  }
+}
 
-
-
-
-#####################################big issue with outliers here
 
 ##reorder training Income
 #table(train$Income)
@@ -150,6 +149,19 @@ summary(imputed)
 testSource[,2:109] = imputed
 summary(testSource)
 write.csv(testSource, "testSource.csv", row.names=FALSE) 
+
+
+##################################################
+trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
+##################################################
+dim(trainSource)
+################################################################################################
+################################################################################################
+testSource<-read.csv("./data/testSource.csv",na.strings="",stringsAsFactors=T)
+################################################################################################
+################################################################################################
+str(testSource)
+
 
 
 
@@ -523,8 +535,8 @@ heatmap(approx10)
 # Hierarchical clustering
 clusterIntensity = hclust(distance, method="ward.D")
 plot(clusterIntensity)
-
-k=8
+objects(clusterIntensity)
+k=7
 rect.hclust(clusterIntensity, k , border = "blue")
 
 happyClusters = cutree(clusterIntensity, k)
@@ -533,6 +545,14 @@ length(happyClusters)
 nrow(trainMatrix)
 tapply(train$Happy,happyClusters,mean)
 table(happyClusters)
+happyClusters<-as.factor(happyClusters)
+trainTrial<-cbind(train,happyClusters)
+head(trainTrial)
+
+L1<-glm(Happy~.-UserID,data=trainTrial,family=binomial)
+summary(L1)
+L2<-glm(Happy~.-UserID,data=trainTrial,family=binomial,subset=happyClusters)
+summary(L2)
 
 ####
 ###Make cluster subsets in both train and test
