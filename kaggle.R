@@ -216,6 +216,8 @@ plot(train$sumNA,col=train$Gender)
 
 plot((train$Income))
 
+table(trainSource$YOB,trainSource$Income)
+
 
 boxplot(train$sumNA~train$Happy)
 tapply(train$sumNA,as.factor(train$Happy),mean)
@@ -391,12 +393,6 @@ testSource$HouseholdStatus<-relevel(testSource$HouseholdStatus,ref="Single (no k
 
 
 
-summary(testSource)
-imputed = complete(mice(testSource[,2:109]))
-summary(imputed)
-testSource[,2:109] = imputed
-summary(testSource)
-write.csv(testSource, "testSource.csv", row.names=FALSE) 
 
 testSource<-read.csv("./data/testSource.csv",stringsAsFactors=T)
 trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
