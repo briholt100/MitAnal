@@ -160,7 +160,7 @@ dim(trainSource)
 testSource<-read.csv("./data/testSource.csv",na.strings="",stringsAsFactors=T)
 ################################################################################################
 ################################################################################################
-str(testSource)
+dim(testSource)
 
 
 library(caTools)
@@ -482,6 +482,43 @@ distance = dist(trainMatrix, method = "euclidean")
 heatmap(trainMatrix)
 plot(rowMeans(trainMatrix),,xlab="Row",ylab="Row Mean",pch=19)
 plot(colMeans(trainMatrix),xlab="Column",ylab="Column Mean",pch=19)
+
+
+#############Principal comp
+pc<-prcomp(trainSourceMatrix)
+objects(pc)
+dim(pc$x)
+plot(pc)
+biplot(pc)
+summary(pc)
+
+Happy.PC.Log1<-glm(Happy~pc$x[,1]+pc$x[,2],data=trainSource,family=binomial)
+summary(Happy.PC.Log1)
+
+Happy.PC.Log1.pred<-predict(Happy.PC.Log1,newdata=testSource,type="response")
+Happy.PC.Log1.pred<-Happy.PC.Log1.pred[1:1980]
+table(test$Happy,Happy.PC.Log1.pred>=.5)
+
+submission11 = data.frame(UserID = testSource$UserID, Probability1 =Happy.PC.Log1.pred)  #Model using trainSource,Princ comp, glm
+write.csv(submission11, "submission11.csv", row.names=FALSE) 
+
+
+
+prc<-princomp(trainMatrix)
+objects(prc)
+prc$scores[,1]
+
+Happy.PrC.Log2<-glm(Happy~prc$scores[,1]+prc$scores[,2],data=train,family=binomial)
+summary(Happy.PrC.Log2)
+Happy.PrC.Log2.pred<-predict(Happy.PrC.Log2,newdata=test,type="response")
+table(test$Happy,Happy.PC.Log1.pred[1:1386][>=.5])
+
+
+
+
+
+
+
 
 svd1 <- svd(scale(trainMatrix))
 which.max(svd1$v[,1])
