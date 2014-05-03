@@ -163,10 +163,8 @@ testSource<-read.csv("./data/testSource.csv",na.strings="",stringsAsFactors=T)
 str(testSource)
 
 
-
-
 library(caTools)
-set.seed(1000)
+#set.seed(1)
 split<-sample.split(trainSource$Happy,SplitRatio = .7)
 train<-subset(trainSource,split==T)
 test<-subset(trainSource,split==F)
@@ -174,11 +172,6 @@ summary(train)
 str(train)
 str(test)
 summary(test)
-
-
-
-
-
 
 #baesline train predcition of happy variable
 table(train$Happy)
@@ -240,8 +233,28 @@ objects(Happy.all.Log)
 ss <- coef(summary(Happy.all.Log))
 head(ss)
 #Take only the rows you want:
-  ss_sig <- ss[ss[,"Pr(>|z|)"]<0.1,]
+  ss_sig <- ss[ss[,"Pr(>|z|)"]<0.05,]
 sigNames<-rownames(ss_sig)
+#sigNames<-sub("2|4|5","",sigNames)
+#sigNames<-sigNames[-c(2:3)]
+sigNames<-sub("Q","+Q",sigNames)
+cat(sigNames)
+
+train.glm1<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881 
+                +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162 
+                +Q100562 +Q99581 +Q98869 +Q98197,data=train,family=binomial)
+summary(train.glm1)
+
+HappyLog.train.glm1.predictions<-predict(train.glm1,newdata=test,type="response")
+table(test$Happy,HappyLog.train.glm1.predictions>=.5)
+(360+605)/nrow(test)
+
+testSourceHappyLog.glm1<-predict(train.glm1,newdata=testSource,type="response")
+submission6 = data.frame(UserID = testSource$UserID, Probability1 = testSourceHappyLog.glm1)  
+write.csv(submission6, "submission6.csv", row.names=FALSE) 
+
+train.glm1.step<-step(train.glm1)
+summary(train.glm1.step)
 
 
 Happy.all.CART<-rpart(Happy~. - UserID,data=train)
@@ -298,6 +311,19 @@ output<-table(test$Happy,HappyLog.CART1_predictions >= .5)
 submission4 = data.frame(UserID = testSource$UserID, Probability1 = HappyLog.CART1_predictions)  #CART Model1
 write.csv(submission4, "submission4.csv", row.names=FALSE) 
 
+
+
+HappyCART.mod2<-rpart(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881 
+                      +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162 
+                      +Q100562 +Q99581 +Q98869 +Q98197,data=trainSource)
+prp(HappyCART.mod2)
+
+HappyLog.CART2_predictions<-predict(HappyCART.mod2,newdata=testSource)
+output<-table(test$Happy,HappyLog.CART2_predictions >= .5)
+(218+707)/(nrow(test))
+
+submission7 = data.frame(UserID = testSource$UserID, Probability1 = HappyLog.CART2_predictions)  #CART Model1
+write.csv(submission7, "submission7.csv", row.names=FALSE) 
 
 
 for(i in 1:length(HappyLog.mod1_predictions)){
@@ -436,6 +462,7 @@ auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 head(train[,c(1:9,110:112)])
 trainMatrix<-data.matrix(train[,c(2:7,9:112)]) ###excludes Devependent variable and userID
 testMatrix<-data.matrix(test[,c(2:7,9:112)]) ###excludes Devependent variable and userID
+trainSourceMatrix<-data.matrix(trainSource[,c(2:7,9:112)]) ###excludes Devependent variable and userID
 testSourceMatrix<-data.matrix(testSource[,c(2:111)]) ###excludes Devependent variable and userID
 
 ####The following is an attempt to make sure testSourceMatrix has same # of variables as train
@@ -457,66 +484,37 @@ plot(rowMeans(trainMatrix),,xlab="Row",ylab="Row Mean",pch=19)
 plot(colMeans(trainMatrix),xlab="Column",ylab="Column Mean",pch=19)
 
 svd1 <- svd(scale(trainMatrix))
+which.max(svd1$v[,1])
+colnames(train[4])
 which.max(svd1$v[,10])
-colnames(train[72])
-> colnames(train[73])
-[1] "Q108754"
-> colnames(train[1])
-[1] "UserID"
-> colnames(train[2])
-[1] "YOB"
-> colnames(train[74])
-[1] "Q108342"
-> maxContrib
-[1] 109
-> colnames(train[110])
-[1] "votes"
-> maxContrib <- which.max(svd1$v[,4])
-> maxContrib
-[1] 110
-> colnames(train[111])
-[1] "sumNA"
-> which.max(svd1$v[,4])
-[1] 110
-> which.max(svd1$v[,5])
-[1] 110
-> which.max(svd1$v[,6])
-[1] 67
-> colnames(train[68])
-[1] "Q108950"
-> which.max(svd1$v[,7])
-[1] 77
-> colnames(train[78])
-[1] "Q106993"
-> which.max(svd1$v[,8])
-[1] 66
-> colnames(train[67])
-[1] "Q109367"
-> which.max(svd1$v[,9])
-[1] 34
-> colnames(train[35])
-[1] "Q117186"
-> which.max(svd1$v[,10])
-[1] 71
-> colnames(train[72])
-[1] "Q108856"
+colnames(train[99])
 
 plot(svd1$d,xlab="Column",ylab="Singluar value",pch=19)
 plot(svd1$d^2/sum(svd1$d^2),xlab="Column",ylab="Percent of variance explained",pch=19)
 plot(svd1$v[,1],pch=19,xlab="Column",ylab="First right singluar vector")
 plot(svd1$v[,2],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,3],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,4],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,5],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,6],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,7],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,8],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,9],pch=19,xlab="Column",ylab="Second right singluar vector")
-plot(svd1$v[,10],pch=19,xlab="Column",ylab="Second right singluar vector")
-
+plot(svd1$v[,3],pch=19,xlab="Column",ylab="third right singluar vector")
+plot(svd1$v[,4],pch=19,xlab="Column",ylab="forth right singluar vector")
+plot(svd1$v[,5],pch=19,xlab="Column",ylab="fift right singluar vector")
+plot(svd1$v[,6],pch=19,xlab="Column",ylab="sixth right singluar vector")
+plot(svd1$v[,7],pch=19,xlab="Column",ylab="seventh right singluar vector")
+plot(svd1$v[,8],pch=19,xlab="Column",ylab="eighth right singluar vector")
+plot(svd1$v[,9],pch=19,xlab="Column",ylab="ninth right singluar vector")
+plot(svd1$v[,10],pch=19,xlab="Column",ylab="tenth right singluar vector")
 approx10 <- svd1$u[,1:10] %*% diag(svd1$d[1:10])%*% t(svd1$v[,1:10])
 heatmap(approx10)
 
+
+svd.glm1<-glm(Happy~Q99982+Q110740+Gender+Q104996+Q98059+Q100689
+              +Q96024+YOB+Q107491+Income,data=trainSource,family=binomial)
+summary(svd.glm1)
+svd.glm1.pred<-predict(svd.glm1,newdata=test,type="response")
+table(test$Happy,svd.glm1.pred>=.5)
+(168+650)/nrow(test)
+
+svdCart.mod1<-rpart(Happy~Q99982+Q110740+Gender+Q104996+Q98059+Q100689
+                    +Q96024+YOB+Q107491+Income,data=trainSource)
+prp(svdCart.mod1)
 
 # Turn matrix into a vector
 #kosVector = as.vector(kosMatrix[,-1])
@@ -529,25 +527,51 @@ heatmap(approx10)
 #distance = dist(kosMatrix[,-1], method = "euclidean")
 
 # Hierarchical clustering
-clusterIntensity = hclust(distance, method="ward.D")
+distanceSource = dist(trainSourceMatrix, method = "euclidean")
+distanceTrain= dist(trainMatrix, method = "euclidean")
+
+clusterIntensity = hclust(distanceTrain, method="ward.D")
 plot(clusterIntensity)
 objects(clusterIntensity)
-k=7
+k=4
 rect.hclust(clusterIntensity, k , border = "blue")
 
 happyClusters = cutree(clusterIntensity, k)
 head(happyClusters)
 length(happyClusters)
 nrow(trainMatrix)
-tapply(train$Happy,happyClusters,mean)
+avgwt<-tapply(train$Happy,happyClusters,mean)
 table(happyClusters)
 happyClusters<-as.factor(happyClusters)
-trainTrial<-cbind(train,happyClusters)
+
+happyClustWeight<-0
+for (i in 1:nrow(train)){
+  if (happyClusters[i]==1){
+    happyClustWeight[i]<-0.5779967
+  }
+  else {
+    if (happyClusters[i]==2){
+      happyClustWeight[i]<-0.5568783
+    }
+  else {
+    if (happyClusters[i]==3){
+      happyClustWeight[i]<-0.5690299
+    }
+  else {
+    if (happyClusters[i]==4){
+      happyClustWeight[i]<-0.5527638
+    }
+  }
+}
+}
+}
+class(happyClustWeight)
+trainTrial<-cbind(train,happyClusters,happyClustWeight)
 head(trainTrial)
 
-L1<-glm(Happy~.-UserID,data=trainTrial,family=binomial)
+L1<-glm(Happy~ happyClustWeight-UserID,data=trainTrial,family=binomial)
 summary(L1)
-L2<-glm(Happy~.-UserID,data=trainTrial,family=binomial,subset=happyClusters)
+L2<-glm(Happy~.-UserID,data=trainTrial,family=binomial,subset=happyClusters==1)
 summary(L2)
 
 ####
@@ -637,7 +661,7 @@ dim(testSourceMatrix) = c(nrow(testSourceMatrix), ncol(testSourceMatrix))
 km.kcca = as.kcca(KMC, trainMatrix)
 
 cluster.train = predict(km.kcca)
-cluster.test = predict(km.kcca, newdata=testSourceMatrix)
+cluster.test = predict(km.kcca, newdata=testMatrix)
 table(cluster.train)
 table(cluster.test)
 
@@ -658,15 +682,27 @@ mean(train4$Happy)
 trainClust.split = split(train, cluster.train)   ##cluster 1 can be accessed HierCluster[[1]], cluster 2 HierCluster[[2]]
 trainClust.split[[1]]
 
-test1<-subset(testSource,cluster.test==1)
-test2<-subset(testSource,cluster.test==2)
-test3<-subset(testSource,cluster.test==3)
-test4<-subset(testSource,cluster.test==4)
+trainSource1<-subset(trainSource,cluster.train==1)
+trainSource2<-subset(trainSource,cluster.train==2)
+trainSource3<-subset(trainSource,cluster.train==3)
+trainSource4<-subset(trainSource,cluster.train==4)
 
-lm1<-glm(Happy~.,train1,family="binomial")
-lm2<-glm(Happy~.,train2,family="binomial")
-lm3<-glm(Happy~.,train3,family="binomial")
-lm4<-glm(Happy~.,train4,family="binomial")
+
+
+test1<-subset(test,cluster.test==1)
+test2<-subset(test,cluster.test==2)
+test3<-subset(test,cluster.test==3)
+test4<-subset(test,cluster.test==4)
+
+testSource1<-subset(testSource,cluster.test==1)
+testSource2<-subset(testSource,cluster.test==2)
+testSource3<-subset(testSource,cluster.test==3)
+testSource4<-subset(testSource,cluster.test==4)
+
+lm1<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881                        +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162+Q100562 +Q99581 +Q98869 +Q98197,trainSource1,family="binomial")
+lm2<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881                        +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162+Q100562 +Q99581 +Q98869 +Q98197,trainSource2,family="binomial")
+lm3<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881                        +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162+Q100562 +Q99581 +Q98869 +Q98197,trainSource3,family="binomial")
+lm4<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881                        +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162+Q100562 +Q99581 +Q98869 +Q98197,trainSource4,family="binomial")
 
 #lm5<-glm(Happy~.,train5,family="binomial")
 #lm6<-glm(Happy~.,train6,family="binomial")
@@ -686,20 +722,27 @@ mean(pred.test3)
 mean(pred.test4)
 SSE<-sum((pred.test1-test1$reimbursement2009)^2)
 
+pred.testSource1<-predict(lm1,newdata=testSource1,type="response")
+pred.testSource2<-predict(lm2,newdata=testSource2,type="response")
+pred.testSource3<-predict(lm3,newdata=testSource3,type="response")
+pred.testSource4<-predict(lm3,newdata=testSource4,type="response")
 
-all.predictions = c(pred.test1, pred.test2, pred.test3,pred.test4)
+
+all.predictions = c(pred.testSource1, pred.testSource2, pred.testSource3,pred.testSource4)
+
+table(test$Happy,all.predictions>=.5)
 length(all.predictions)
 
-submission5 = data.frame(UserID = testSource$UserID, Probability1 = all.predictions)  #CART Model1
-write.csv(submission5, "submission5.csv", row.names=FALSE) 
+submission9 = data.frame(UserID = testSource$UserID, Probability1 = all.predictions)  #Model using train, clusterin glms
+write.csv(submission9, "submission9.csv", row.names=FALSE) 
+
+submission10 = data.frame(UserID = testSource$UserID, Probability1 = all.predictions)  #Model using trainSource, clusterin glms
+write.csv(submission10, "submission10.csv", row.names=FALSE) 
+
+
+
 
 head(submission5)
-
-
-
-
-
-
 
 
 
