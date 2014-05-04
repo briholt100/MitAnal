@@ -39,9 +39,16 @@ trainKaggle$testType<-rep("train",nrow(trainKaggle))
 str(trainKaggle[,95:111])
 str(testKaggle[,95:110])
 
+#remove Happy from trainKaggle, make it to last column
+trainHappy<-trainKaggle$Happy
+trainKaggle<-trainKaggle[,-8]
+trainKaggle$Happy<-trainHappy
+testKaggle$Happy<-rep(NA,nrow(testKaggle))
+summary(testKaggle)
 
-
-all.data<-rbind(trainKaggle[,-8],testKaggle)
+all.data<-rbind(trainKaggle,testKaggle)
+tail(all.data)
+#all.data<-rbind(trainKaggle[,-8],testKaggle)
 
 
 #create new variable, which is a sum of NA's
@@ -184,9 +191,9 @@ summary(testSource)
 write.csv(testSource, "testSource.csv", row.names=FALSE) 
 
 #for all.data
-imputed = complete(mice(all.data[,2:109]))
+imputed = complete(mice(all.data[,-1]))
 summary(imputed)
-all.data[,2:109] = imputed
+all.data[,-1] = imputed
 summary(all.data)
 write.csv(all.data, "all.data.csv", row.names=FALSE)
 
@@ -302,16 +309,17 @@ summary(train.glm1)
 
 HappyLog.train.glm1.predictions<-predict(train.glm1,newdata=test,type="response")
 table(test$Happy,HappyLog.train.glm1.predictions>=.5)
-(360+605)/nrow(test)
+(357+598)/nrow(test)
 
 testSourceHappyLog.glm1<-predict(train.glm1,newdata=testSource,type="response")
-submission6 = data.frame(UserID = testSource$UserID, Probability1 = testSourceHappyLog.glm1)  
-write.csv(submission6, "submission6.csv", row.names=FALSE) 
+submission13 = data.frame(UserID = testSource$UserID, Probability1 = testSourceHappyLog.glm1)  
+write.csv(submission13, "submission13.csv", row.names=FALSE) 
 
 train.glm1.step<-step(train.glm1)
 summary(train.glm1.step)
 
-
+library(rpart)
+library(rpart.plot)
 Happy.all.CART<-rpart(Happy~. - UserID,data=train)
 prp(Happy.all.CART)
 
