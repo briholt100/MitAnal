@@ -32,6 +32,13 @@ setwd("./MitAnal")  #dater
 dir()
 #trainSource<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
 #testSource<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
+trainKaggle<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T)
+testKaggle<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
+testKaggle$testType<-rep("test",nrow(testKaggle))
+trainKaggle$testType<-rep("train",nrow(trainKaggle))
+
+all.data<-rbind(trainKaggle[,-8],testKaggle)
+
 
 #create new variable, which is a sum of NA's
 
@@ -84,6 +91,11 @@ testSource$YOB<-year(testSource$YOB)
 table((trainSource$YOB))
 table((testSource$YOB))
 
+all.data$YOB<-as.Date(as.character(all.data$YOB),format="%Y")
+all.data$YOB<-year(all.data$YOB)
+table((all.data$YOB))
+
+
 for(i in 1:length(trainSource$YOB)){
   if (!is.na(trainSource$YOB[i])){
     if(trainSource$YOB[i] < 1931 | trainSource$YOB[i]>2001) {
@@ -116,6 +128,7 @@ trainSource$Income<-relevel(trainSource$Income,ref="under $25,000")
 levels(trainSource$EducationLevel)
 trainSource$EducationLevel<-relevel(trainSource$EducationLevel,ref="Current K-12")
 trainSource$HouseholdStatus<-relevel(trainSource$HouseholdStatus,ref="Single (no kids)")
+
 #######for testSource
 testSource$Income<-relevel(testSource$Income,ref="over $150,000")
 testSource$Income<-relevel(testSource$Income,ref="$100,001 - $150,000")
@@ -124,10 +137,17 @@ testSource$Income<-relevel(testSource$Income,ref="$50,000 - $74,999")
 testSource$Income<-relevel(testSource$Income,ref="$25,001 - $50,000")
 testSource$Income<-relevel(testSource$Income,ref="under $25,000")
 
-levels(testSource$EducationLevel)
-testSource$EducationLevel<-relevel(testSource$EducationLevel,ref="Current K-12")
-testSource$HouseholdStatus<-relevel(testSource$HouseholdStatus,ref="Single (no kids)")
+#######for all.data
+all.data$Income<-relevel(all.data$Income,ref="over $150,000")
+all.data$Income<-relevel(all.data$Income,ref="$100,001 - $150,000")
+all.data$Income<-relevel(all.data$Income,ref="$75,000 - $100,000")
+all.data$Income<-relevel(all.data$Income,ref="$50,000 - $74,999")
+all.data$Income<-relevel(all.data$Income,ref="$25,001 - $50,000")
+all.data$Income<-relevel(all.data$Income,ref="under $25,000")
 
+levels(all.data$EducationLevel)
+all.data$EducationLevel<-relevel(all.data$EducationLevel,ref="Current K-12")
+all.data$HouseholdStatus<-relevel(all.data$HouseholdStatus,ref="Single (no kids)")
 
 
 
@@ -570,7 +590,7 @@ distanceTrain= dist(trainMatrix, method = "euclidean")
 clusterIntensity = hclust(distanceTrain, method="ward.D")
 plot(clusterIntensity)
 objects(clusterIntensity)
-k=4
+k=2
 rect.hclust(clusterIntensity, k , border = "blue")
 
 happyClusters = cutree(clusterIntensity, k)
@@ -783,4 +803,10 @@ head(submission5)
 
 
 
+
+###############tables sniffing for odd stuff######
+table(all.data$YOB,all.data$Education,exclude=NULL)
+boxplot(table(all.data$YOB,all.data$Income,exclude=NULL))
+
+table(all.data$Q113181, all.data$Q98197,exclude=NULL)
 
