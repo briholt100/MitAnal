@@ -188,11 +188,24 @@ imputed = complete(mice(all.data[,2:109]))
 summary(imputed)
 all.data[,2:109] = imputed
 summary(all.data)
-####Must split all.data into trainKaggle and testKaggle, and then combine, using melt or merge, happy back into trainKaggle
 write.csv(all.data, "all.data.csv", row.names=FALSE)
 
+####Must split all.data into trainKaggle and testKaggle, and then combine, using melt or merge, happy back into trainKaggles
+a<-all.data[all.data$testType=="train",]
+b<-all.data[all.data$testType=="test",]
 
+trainMerge<-merge(a,trainSource[,c(1,8)],by=c("UserID","UserID"),all.x=T)
+#trainMerge<-trainMerge[,-110]   #removes "testType"
+#b<-b[,-110]#removes "testType"
+trainMerge<-merge(a,trainSource[,c(1,8,111:112)],by=c("UserID","UserID"),all.x=T)
+trainSource<-trainMerge
 
+testMerge<-merge(b,testSource[,c(1,110:111)],by=c("UserID","UserID"),all.x=T)
+dim(testSource)
+summary(testSource)
+
+write.csv(trainSource, "trainSource.csv", row.names=FALSE) 
+write.csv(testSource, "testSource.csv", row.names=FALSE) 
 ##################################################
 trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
 ##################################################
