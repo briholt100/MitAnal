@@ -36,6 +36,10 @@ trainKaggle<-read.csv("./data/Kaggle_train.csv",na.strings="",stringsAsFactors=T
 testKaggle<-read.csv("./data/Kaggle_test.csv",na.strings="",stringsAsFactors=T)
 testKaggle$testType<-rep("test",nrow(testKaggle))
 trainKaggle$testType<-rep("train",nrow(trainKaggle))
+str(trainKaggle[,95:111])
+str(testKaggle[,95:110])
+
+
 
 all.data<-rbind(trainKaggle[,-8],testKaggle)
 
@@ -93,7 +97,16 @@ table((testSource$YOB))
 
 all.data$YOB<-as.Date(as.character(all.data$YOB),format="%Y")
 all.data$YOB<-year(all.data$YOB)
-table((all.data$YOB))
+table(all.data$YOB,exclude=NULL)
+
+for(i in 1:length(all.data$YOB)){
+  if (!is.na(all.data$YOB[i])){
+    if(all.data$YOB[i] < 1931 | all.data$YOB[i]>2000) {
+      all.data$YOB[i]<-NA
+      print(all.data$YOB[i])
+    }
+  }
+}
 
 
 for(i in 1:length(trainSource$YOB)){
@@ -169,6 +182,15 @@ summary(imputed)
 testSource[,2:109] = imputed
 summary(testSource)
 write.csv(testSource, "testSource.csv", row.names=FALSE) 
+
+#for all.data
+imputed = complete(mice(all.data[,2:109]))
+summary(imputed)
+all.data[,2:109] = imputed
+summary(all.data)
+####Must split all.data into trainKaggle and testKaggle, and then combine, using melt or merge, happy back into trainKaggle
+write.csv(all.data, "all.data.csv", row.names=FALSE)
+
 
 
 ##################################################
@@ -805,8 +827,11 @@ head(submission5)
 
 
 ###############tables sniffing for odd stuff######
-table(all.data$YOB,all.data$Education,exclude=NULL)
-boxplot(table(all.data$YOB,all.data$Income,exclude=NULL))
+(table(all.data$YOB,all.data$Education,exclude=NULL))
+(table(all.data$YOB,all.data$Income,exclude=NULL))
+(table(all.data$Income,all.data$Education,exclude=NULL))
 
 table(all.data$Q113181, all.data$Q98197,exclude=NULL)
+ table(all.data$Q111580,all.data$YOB>=2001)  #as a teenager, parents demanding?
+
 
