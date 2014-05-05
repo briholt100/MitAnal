@@ -43,7 +43,8 @@ str(testKaggle[,95:110])
 trainHappy<-trainKaggle$Happy
 trainKaggle<-trainKaggle[,-8]
 trainKaggle$Happy<-trainHappy
-testKaggle$Happy<-rep(NA,nrow(testKaggle))
+testKaggle$Happy<-NA#rep(0,nrow(testKaggle))
+testKaggle$Happy
 summary(testKaggle)
 
 all.data<-rbind(trainKaggle,testKaggle)
@@ -197,6 +198,16 @@ all.data[,-1] = imputed
 summary(all.data)
 write.csv(all.data, "all.data.csv", row.names=FALSE)
 
+all.data$Happy[all.data$testType=="test"]
+submission14 = data.frame(UserID = testSource$UserID, Probability1 = testSourceHappyLog.glm1)  
+write.csv(submission14, "submission14.csv", row.names=FALSE) 
+
+
+summary(all.data)
+
+
+
+
 ####Must split all.data into trainKaggle and testKaggle, and then combine, using melt or merge, happy back into trainKaggles
 a<-all.data[all.data$testType=="train",]
 b<-all.data[all.data$testType=="test",]
@@ -217,6 +228,7 @@ write.csv(testSource, "testSource.csv", row.names=FALSE)
 trainSource<-read.csv("./data/trainSource.csv",stringsAsFactors=T)
 ##################################################
 dim(trainSource)
+summary(trainSource)
 ################################################################################################
 ################################################################################################
 testSource<-read.csv("./data/testSource.csv",na.strings="",stringsAsFactors=T)
@@ -258,6 +270,144 @@ boxplot(as.numeric(train$Income)~as.numeric(train$Happy))
 
 #answers <- read.csv("train.csv", stringsAsFactors=FALSE)
 #answers[answers==''] <- "IGNORED"
+
+
+
+summary(train$votes)
+#vote categories  or equal ranges...
+
+quantile(train$votes,probs = seq(0, 1, 0.25))
+
+vote1<-subset(train,train$votes<=45)  
+vote2<-subset(train,train$votes>=46 & train$votes<=81 )  
+vote3<-subset(train,train$votes>=82 & train$votes<=99)  
+vote4<-subset(train,train$votes>=100 & train$votes<=101)  
+
+test.vote1<-subset(test,test$votes<=45)  
+test.vote2<-subset(test,test$votes>=46 & test$votes<=81 )  
+test.vote3<-subset(test,test$votes>=82 & test$votes<=99)  
+test.vote4<-subset(test,test$votes>=100 & test$votes<=101)  
+
+testSource.vote1<-subset(testSource,testSource$votes<=45)  
+testSource.vote2<-subset(testSource,testSource$votes>=46 & testSource$votes<=81 )  
+testSource.vote3<-subset(testSource,testSource$votes>=82 & testSource$votes<=99)  
+testSource.vote4<-subset(testSource,testSource$votes>=100 & testSource$votes<=101)  
+
+trainSource.vote1<-subset(trainSource,trainSource$votes<=45)  
+trainSource.vote2<-subset(trainSource,trainSource$votes>=46 & trainSource$votes<=81 )  
+trainSource.vote3<-subset(trainSource,trainSource$votes>=82 & trainSource$votes<=99)  
+trainSource.vote4<-subset(trainSource,trainSource$votes>=100 & trainSource$votes<=101)  
+
+
+
+vote1.glm1<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881 
+                +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162 
+                +Q100562 +Q99581 +Q98869 +Q98197-UserID,data=vote1, family = binomial)
+summary(vote1.glm1)
+step(vote1.glm1)
+vote1.glm1.step<-glm(formula = Happy ~ HouseholdStatus + Q121011 + Q119334 + Q118237 + 
+      Q116441 + Q113181 + Q108855 + Q108856 + Q108342 + Q108343 + 
+      Q107869 + Q102906 + Q102289 + Q101162 + Q100562 + Q98869, 
+    family = binomial, data = vote1)
+summary(vote1.glm1.step)
+ss <- coef(summary(vote1.glm1))
+head(ss)
+#Take only the rows you want:
+ss_sig <- ss[ss[,"Pr(>|z|)"]<0.05,]
+sigNames<-rownames(ss_sig)
+#sigNames<-sub("2|4|5","",sigNames)
+#sigNames<-sigNames[-c(2:3)]
+sigNames<-sub("Q","+Q",sigNames)
+cat(sigNames)
+
+vote2.glm1<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881 
+                +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162 
+                +Q100562 +Q99581 +Q98869 +Q98197-UserID,data=vote2, family = binomial)
+step(vote2.glm1)
+
+
+vote2.glm1.step<-glm(formula = Happy ~ Q121011 + Q120014 + Q119334 + Q118237 + 
+      Q116797 + Q116441 + Q114386 + Q108855 + Q107869 + Q102289 + 
+      Q101162 + Q100562 + Q98869, family = binomial, data = vote2)
+
+
+
+vote3.glm1<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881 
+                +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162 
+                +Q100562 +Q99581 +Q98869 +Q98197-UserID,data=vote3, family = binomial)
+step(vote3.glm1)
+
+vote3.glm1.step<-glm(Happy ~ HouseholdStatus + Q122120 + Q121011 + Q120014 + 
+  Q119334 + Q118237 + Q116881 + Q116441 + Q113181 + Q108754 + 
+  Q107869 + Q102906 + Q102289 + Q101162, family = binomial, 
+data = vote3)
+
+
+vote4.glm1<-glm(Happy~Income+ HouseholdStatus+ EducationLevel +Q122120 +Q121011 +Q120014 +Q119334 +Q118237 +Q116797 +Q116881 
+                +Q116441 +Q114386 +Q113181 +Q108855 +Q108856 +Q108754 +Q108342 +Q108343 +Q107869 +Q102906 +Q102289 +Q101162 
+                +Q100562 +Q99581 +Q98869 +Q98197-UserID,data=vote4, family = binomial)
+step(vote4.glm1)
+vote4.glm1.step<-glm(formula = Happy ~ HouseholdStatus + Q119334 + Q118237 + Q116881 + 
+      Q116441 + Q114386 + Q113181 + Q108855 + Q108754 + Q108342 + 
+      Q108343 + Q107869 + Q102906 + Q102289 + Q101162 + Q100562 + 
+      Q98869 + Q98197, family = binomial, data = vote4)
+
+vote1.glm1.step.pred<-predict(vote1.glm1.step,newdata=test.vote1,type="response")
+vote2.glm1.step.pred<-predict(vote2.glm1.step,newdata=test.vote2,type="response")
+vote3.glm1.step.pred<-predict(vote3.glm1.step,newdata=test.vote3,type="response")
+vote4.glm1.step.pred<-predict(vote4.glm1.step,newdata=test.vote4,type="response")
+allpred<-c(vote1.glm1.step.pred,vote2.glm1.step.pred,vote3.glm1.step.pred,vote4.glm1.step.pred)
+table(test$Happy,allpred>=.5)
+(253+460)/nrow(test)
+
+table(test.vote1$Happy,vote1.glm1.step.pred>=.5)
+(110+43)/nrow(test.vote1)
+
+table(test.vote2$Happy,vote2.glm1.step.pred>=.5)
+(83+142)/nrow(test.vote2)
+
+table(test.vote3$Happy,vote3.glm1.step.pred>=.5)
+(88+156)/nrow(test.vote3)
+
+table(test.vote4$Happy,vote4.glm1.step.pred>=.5)
+(99+146)/nrow(test.vote4)
+
+
+####breakdown of step logs from bins of votes
+
+##make testSource and trainSourceinto subsets...done above
+
+##Now make modle using trainSource, 
+trainSource.vote1.glm1.step<-glm(formula = Happy ~ HouseholdStatus + Q121011 + Q119334 + Q118237 + 
+                       Q116441 + Q113181 + Q108855 + Q108856 + Q108342 + Q108343 + 
+                       Q107869 + Q102906 + Q102289 + Q101162 + Q100562 + Q98869, 
+                     family = binomial, data = trainSource.vote1)
+
+trainSource.vote2.glm1.step<-glm(formula = Happy ~ Q121011 + Q120014 + Q119334 + Q118237 + 
+                       Q116797 + Q116441 + Q114386 + Q108855 + Q107869 + Q102289 + 
+                       Q101162 + Q100562 + Q98869, family = binomial, data = trainSource.vote2)
+
+trainSource.vote3.glm1.step<-glm(Happy ~ HouseholdStatus + Q122120 + Q121011 + Q120014 + 
+                       Q119334 + Q118237 + Q116881 + Q116441 + Q113181 + Q108754 + 
+                       Q107869 + Q102906 + Q102289 + Q101162, family = binomial, data = trainSource.vote3)
+
+trainSource.vote4.glm1.step<-glm(formula = Happy ~ HouseholdStatus + Q119334 + Q118237 + Q116881 + 
+                       Q116441 + Q114386 + Q113181 + Q108855 + Q108754 + Q108342 + 
+                       Q108343 + Q107869 + Q102906 + Q102289 + Q101162 + Q100562 + 
+                       Q98869 + Q98197, family = binomial, data = trainSource.vote4)
+
+#then predict onto test source
+testSource.vote1.glm1.step.pred<-predict(trainSource.vote1.glm1.step,newdata=testSource.vote1,type="response")
+testSource.vote2.glm1.step.pred<-predict(trainSource.vote2.glm1.step,newdata=testSource.vote2,type="response")
+testSource.vote3.glm1.step.pred<-predict(trainSource.vote3.glm1.step,newdata=testSource.vote3,type="response")
+testSource.vote4.glm1.step.pred<-predict(trainSource.vote4.glm1.step,newdata=testSource.vote4,type="response")
+
+
+####combine into "all.predict"
+all.predictions = c(testSource.vote1.glm1.step.pred,testSource.vote2.glm1.step.pred,testSource.vote3.glm1.step.pred,testSource.vote4.glm1.step.pred)
+submission14 = data.frame(UserID = testSource$UserID, Probability1 = all.predictions)  
+write.csv(submission14, "submission14.csv", row.names=FALSE) 
+
 
 
 
@@ -337,7 +487,7 @@ Happy.svd.CART.Predict<-predict(Happy.svd.CART,newdata=test)
 
 
 table(test$Happy,Happy.svd.CART.Predict>=.5)
-(218+570)/(nrow(test)) #.568
+(191+642)/(nrow(test)) #.568
 
 
 
@@ -576,12 +726,7 @@ summary(Happy.PrC.Log2)
 Happy.PrC.Log2.pred<-predict(Happy.PrC.Log2,newdata=test,type="response")
 table(test$Happy,Happy.PC.Log1.pred[1:1386][>=.5])
 
-
-
-
-
-
-
+######SVD
 
 svd1 <- svd(scale(trainMatrix))
 which.max(svd1$v[,1])
@@ -627,22 +772,138 @@ prp(svdCart.mod1)
 #distance = dist(kosMatrix[,-1], method = "euclidean")
 
 # Hierarchical clustering
-distanceSource = dist(trainSourceMatrix, method = "euclidean")
+distance.trainSource = dist(trainSourceMatrix, method = "euclidean")
+distance.testSource = dist(testSourceMatrix, method = "euclidean")
 distanceTrain= dist(trainMatrix, method = "euclidean")
+distanceTest= dist(testMatrix, method = "euclidean")
 
 clusterIntensity = hclust(distanceTrain, method="ward.D")
 plot(clusterIntensity)
-objects(clusterIntensity)
-k=2
-rect.hclust(clusterIntensity, k , border = "blue")
+
+test.clusterIntensity = hclust(distanceTest, method="ward.D")
+plot(test.clusterIntensity)
+
+trainSource.clusterIntensity = hclust(distance.trainSource, method="ward.D")
+plot(trainSource.clusterIntensity)
+
+testSource.clusterIntensity = hclust(distance.testSource, method="ward.D")
+plot(testSource.clusterIntensity)
+
+k=4
+rect.hclust(testSource.clusterIntensity, k , border = "blue")
+rect.hclust(trainSource.clusterIntensity, k , border = "blue")
 
 happyClusters = cutree(clusterIntensity, k)
-head(happyClusters)
-length(happyClusters)
-nrow(trainMatrix)
-avgwt<-tapply(train$Happy,happyClusters,mean)
-table(happyClusters)
-happyClusters<-as.factor(happyClusters)
+test.happyClusters = cutree(test.clusterIntensity, k)
+
+happyClusters = cutree(clusterIntensity, k)
+test.happyClusters = cutree(test.clusterIntensity, k)
+
+trainSource.happyClusters = cutree(trainSource.clusterIntensity, k)
+testSource.happyClusters = cutree(testSource.clusterIntensity, k)
+
+testSource$happyClusters<-as.factor(testSource.happyClusters)
+trainSource$happyClusters<-as.factor(trainSource.happyClusters)
+
+test$happyClusters<-as.factor(test.happyClusters)
+
+hclust1.train<-subset(train,train$happyClusters==1)
+hclust2.train<-subset(train,train$happyClusters==2)
+hclust3.train<-subset(train,train$happyClusters==3)
+hclust4.train<-subset(train,train$happyClusters==4)
+
+hclust1.test<-subset(test,test$happyClusters==1)
+hclust2.test<-subset(test,test$happyClusters==2)
+hclust3.test<-subset(test,test$happyClusters==3)
+hclust4.test<-subset(test,test$happyClusters==4)
+
+
+hclust1.trainSource<-subset(trainSource,trainSource$happyClusters==1)
+hclust2.trainSource<-subset(trainSource,trainSource$happyClusters==2)
+hclust3.trainSource<-subset(trainSource,trainSource$happyClusters==3)
+hclust4.trainSource<-subset(trainSource,trainSource$happyClusters==4)
+
+hclust1.testSource<-subset(testSource,testSource$happyClusters==1)
+hclust2.testSource<-subset(testSource,testSource$happyClusters==2)
+hclust3.testSource<-subset(testSource,testSource$happyClusters==3)
+hclust4.testSource<-subset(testSource,testSource$happyClusters==4)
+
+###Now, must run rpart, but when I make individual predictions, I must merge the data based on UserID.
+
+hclust1.train.cart<-rpart(Happy~.-UserID,data=hclust1.train)
+hclust2.train.cart<-rpart(Happy~.-UserID,data=hclust2.train)
+hclust3.train.cart<-rpart(Happy~.-UserID,data=hclust3.train)
+hclust4.train.cart<-rpart(Happy~.-UserID,data=hclust4.train)
+
+prp(hclust1.train.cart)
+prp(hclust2.train.cart)
+prp(hclust3.train.cart)
+prp(hclust4.train.cart)
+
+hclust1.test.cart<-rpart(Happy~.-UserID,data=hclust1.test)
+hclust2.test.cart<-rpart(Happy~.-UserID,data=hclust2.test)
+hclust3.test.cart<-rpart(Happy~.-UserID,data=hclust3.test)
+hclust4.test.cart<-rpart(Happy~.-UserID,data=hclust4.test)
+
+prp(hclust1.test.cart)
+prp(hclust2.test.cart)
+prp(hclust3.test.cart)
+prp(hclust4.test.cart)
+
+
+hclust1.trainSource.cart<-rpart(Happy~.-UserID,data=hclust1.trainSource)
+hclust2.trainSource.cart<-rpart(Happy~.-UserID,data=hclust2.trainSource)
+hclust3.trainSource.cart<-rpart(Happy~.-UserID,data=hclust3.trainSource)
+hclust4.trainSource.cart<-rpart(Happy~.-UserID,data=hclust4.trainSource)
+
+prp(hclust1.trainSource.cart)
+prp(hclust2.trainSource.cart)
+prp(hclust3.trainSource.cart)
+prp(hclust4.trainSource.cart)
+
+
+hclust1.cart.pred.testSource<-predict(hclust1.trainSource.cart,newdata=hclust1.testSource)
+hclust2.cart.pred.testSource<-predict(hclust2.trainSource.cart,newdata=hclust2.testSource)
+hclust3.cart.pred.testSource<-predict(hclust3.trainSource.cart,newdata=hclust3.testSource)
+hclust4.cart.pred.testSource<-predict(hclust4.trainSource.cart,newdata=hclust4.testSource)
+
+
+#first merge predictions to userID of cluster.testSource, done below 
+
+hclust1.testSource$Prediction<-as.vector(hclust1.cart.pred.testSource)
+hclust2.testSource$Prediction<-as.vector(hclust2.cart.pred.testSource)
+hclust3.testSource$Prediction<-as.vector(hclust3.cart.pred.testSource)
+hclust4.testSource$Prediction<-as.vector(hclust4.cart.pred.testSource)
+
+#then pull just those rows with UserID and prediction.  That should be submitted.
+
+all.cart.Pred<-rbind(hclust1.testSource[,c(1,113)], hclust2.testSource[,c(1,113)], hclust3.testSource[,c(1,113)], hclust4.testSource[,c(1,113)])
+head(all.cart.Pred)
+all.cart.Pred<-all.cart.Pred[order(all.cart.Pred$UserID),]
+head(all.cart.Pred)
+colnames(all.cart.Pred)<-c("UserID","Probability1")
+submission15 = data.frame(all.cart.Pred)  
+write.csv(submission15, "submission15.csv", row.names=FALSE) 
+
+
+hclust1.cart.pred<-predict(hclust1.train.cart,newdata=hclust1.test)
+hclust2.cart.pred<-predict(hclust2.train.cart,newdata=hclust2.test)
+hclust3.cart.pred<-predict(hclust3.train.cart,newdata=hclust3.test)
+hclust4.cart.pred<-predict(hclust4.train.cart,newdata=hclust4.test)
+
+
+all.pred<-c(hclust1.cart.pred,hclust2.cart.pred,hclust3.cart.pred,hclust4.cart.pred)
+table(test$Happy,all.pred>=.5)
+(245+486)/nrow(test)
+
+table(hclust4.test$Happy,hclust4.cart.pred>=.5)
+(121+135)/nrow(hclust1.test)
+(76+133)/nrow(hclust2.test)
+(50+163)/nrow(hclust3.test)
+(76+142)/nrow(hclust4.test)
+
+
+
 
 happyClustWeight<-0
 for (i in 1:nrow(train)){
