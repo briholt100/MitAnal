@@ -17,13 +17,11 @@ avgBD<-tapply(crabs$BD,grp,mean)
 #see pg 19, 20 for "wegith" "offset" "cases"
 
 
-
 ###########################
 #   Note about file names
 #   Kaggle_test & Kaggle_train are the original data from competition
 #   trainSource and testSource have had their data imputed down in this code..  
 ###########################
-
 
 
 getwd()
@@ -1101,11 +1099,7 @@ submission10 = data.frame(UserID = testSource$UserID, Probability1 = all.predict
 write.csv(submission10, "submission10.csv", row.names=FALSE) 
 
 
-
-
 head(submission5)
-
-
 
 
 ###############tables sniffing for odd stuff######
