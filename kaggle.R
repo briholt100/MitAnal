@@ -1,6 +1,6 @@
 #http://www.r-statistics.com/2013/08/k-means-clustering-from-r-in-action/#more-61075
 
-library(MASS)
+#library(MASS)
 data(crabs)
 data(crabsgp)
 str(crabs)
