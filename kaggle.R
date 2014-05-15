@@ -1,7 +1,7 @@
 #http://www.r-statistics.com/2013/08/k-means-clustering-from-r-in-action/#more-61075
 
 #library(MASS)
-#data(crabs)
+data(crabs)
 data(crabsgp)
 str(crabs)
 brks<-quantile(crabs$BD,probs=seq(0,1,.2))
