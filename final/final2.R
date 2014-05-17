@@ -13,7 +13,7 @@ nytimes$type<-as.factor(nytimes$type)
 library(caTools)
 set.seed(144)
 spl<-sample.split(nytimes$popular,SplitRatio = .7)
-spl
+#spl
 train<-subset(nytimes,spl==T)
 test<-subset(nytimes,spl==F)
 
@@ -34,5 +34,7 @@ pop.glm1$coef
 1/(1+exp(-(-2.27148)))
 #the log response function:   1/1 +e^-(-2.27)
 
+exp(-0.8468333)  #beta coef are the log odds for that variable.  By taking e^beta you get odds, all other variables equal
 
-exp(-0.8468333)
+
+##test set predictions next
