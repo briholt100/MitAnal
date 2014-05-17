@@ -83,8 +83,8 @@ ftable(kosClusters, KMC$cluster)
 
 
 ##New section HW #6
-
-airlines<-read.csv("./data/AirlinesCluster.csv")
+getwd()
+airlines<-read.csv("/home/brian/Projects/MitAnal/data/AirlinesCluster.csv")
 str(airlines)
 summary(airlines)
 install.packages("caret")
