@@ -33,7 +33,7 @@ sales.lm3 <- lm(ElantraSales~ factor.month + Unemployment + CPI_all + CPI_energy
 summary(sales.lm3)
 
 #correlations:
-cor(elantra[,1:7])
+cor(train[,1:7])
 
 
 step(sales.lm3)
