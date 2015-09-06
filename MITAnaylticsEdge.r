@@ -1,9 +1,10 @@
 getwd()
 dir()
-read.csv(file="WHO.csv")
-WHO<-read.csv(file="WHO.csv")
+read.csv(file="./data/WHO.csv")
+WHO<-read.csv(file="./data/WHO.csv")
 str(WHO)
 summary(WHO$Over60)
+#Over60 is a percentage, I believe, as is Under15; Population appears to be in millions
 plot(WHO$GNI, WHO$FertilityRate)
 Outliers = subset(WHO, GNI > 10000 & FertilityRate > 2.5)
 Outliers
@@ -18,15 +19,15 @@ tapply(WHO$LiteracyRate, WHO$Region, min, na.rm=T)
 mean(WHO$Over60)
 
 
-usda<-read.csv("USDA.csv")
+usda<-read.csv("./data/USDA.csv")
 summary(usda)
 usda[which.max(usda$Sodium),2]
 HighSodium <- subset(usda,usda$Sodium>10000)
 usda[match("CAVIAR",usda$Descrip),]
 sd(usda$Sodium,na.rm=T)
 
-head(read.csv("mvtWeek1.csv"))
-mvt<-read.csv("mvtWeek1.csv")
+head(read.csv("./data/mvtWeek1.csv"))
+mvt<-read.csv("./data/mvtWeek1.csv")
 str(mvt)
 DateConvert <- as.Date(strptime(mvt$Date, "%m/%d/%y %H:%M"))
 mvt$Month = months(DateConvert)
@@ -43,12 +44,12 @@ table(mvt$Arrest,mvt$Year)
 
 
 
-IBM<-read.csv("IBMStock.csv")
-GE<-read.csv("GEStock.csv")
-ProcterGamble<-read.csv("ProcterGambleStock.csv")
-CocaCola<-read.csv("CocaColaStock.csv")
-Boeing<-read.csv("BoeingStock.csv")
-str
+IBM<-read.csv("./data/IBMStock.csv")
+GE<-read.csv("./data/GEStock.csv")
+ProcterGamble<-read.csv("./data/ProcterGambleStock.csv")
+CocaCola<-read.csv("./data/CocaColaStock.csv")
+Boeing<-read.csv("./data/BoeingStock.csv")
+
 IBM$Date = as.Date(IBM$Date, "%m/%d/%y")
 
 GE$Date = as.Date(GE$Date, "%m/%d/%y")
@@ -78,13 +79,13 @@ abline(v=as.Date(c("2005-01-01")), lwd=2, lty=2, col="orange")
 tapply(GE$Stock,months(GE$Date),mean)
 mean(CocaCola$Stock)
 
-ap<-read.csv(file="AnonymityPoll.csv")
+ap<-read.csv(file="./data/AnonymityPoll.csv")
 str(ap)
 summary(ap)
 table(ap$Smart,ap$Inter,exclude=NULL)
 
 
-limited<-subset(ap,ap$Inter == 1 | ap$Smart == 1) 
+limited<-subset(ap,ap$Inter == 1 | ap$Smart == 1)
 nrow(limited)
 summary(limited)
 table(limited$Privacy.Law,exclude = NULL)
@@ -100,7 +101,7 @@ tapply(limited$Info.,limited$Smart,summary)
 tapply(limited$Tried.,limited$Smart,table,exclude =NULL)
 max(table(limited$Age, limited$Info.On.Internet,exclude =NULL))
 
-cps<-read.csv(file="CPSData.csv")
+cps<-read.csv(file="./data/CPSData.csv")
 str(cps)
 max(table(cps$Indust))
 sort(table(cps$State))
