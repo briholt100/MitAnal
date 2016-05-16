@@ -172,3 +172,7 @@ predictions = predict(tweetLog, newdata=testSparse, type="response")
 table(testSparse$Negative,predictions >= .5)
 
 (245+34)/nrow(testSparse)
+
+
+
+set.seed(144)
