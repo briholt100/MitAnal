@@ -86,10 +86,10 @@ predictTest<-predict(model4,newdata=wine_test)
 predictTest
 class(predictTest)
 
-SSE=sum((wine_test$Price - predictTest)^2) 
+SSE=sum((wine_test$Price - predictTest)^2)
 SST =sum((wine_test$Price - mean(wine$Price))^2)  #the mean comes from the baseline model
 
-1-SSE/SST  # this is R^2 
+1-SSE/SST  # this is R^2
 
 
 #
@@ -255,14 +255,14 @@ FluTest<-read.csv("./data/FluTest.csv")
 PredTest1 = exp(predict(FluTrend1, newdata=FluTest))
 PredTest1[grep("2012-03-11",FluTest$Week)] #finds record of march 11, 2012 in fluTest, then pulls our prediction
 #Observed ILI compared to estimated:
-(FluTest$ILI[11]-PredTest1[11])/FluTest$ILI[11]
+(FluTest$ILI[11]-PredTest1[11])/FluTest$ILI[11] #relative error
 
 
 SSE<-sum((PredTest1-FluTest$ILI)^2)
 SST
 RMSE<-sqrt(SSE/nrow(FluTest))
 
-library(zoo)
+library("zoo")
 FluTest<-read.csv("./data/FluTest.csv")
 FluTrain<-read.csv("./data/FluTrain.csv")
 
@@ -373,7 +373,7 @@ table(test$TenYearCHD,predictTest>.5)
 #Overall accuracy is TN and TP divided by total N
 (1069+11)/sum(1069,187,6,11)
 
-##baseline method suggests that you would predict 0, 
+##baseline method suggests that you would predict 0,
 #so that would be getting an accuracy of adding up the accuracy row, or 1069+6
 #divided by total number of N.
 (1069+6)/sum(1069,187,6,11)
@@ -446,7 +446,7 @@ table(baseball$Year)
 PlayoffTable = table(baseball$Year)
 names(PlayoffTable)
 PlayoffTable[c("1990","2001")]
-baseball$NumCompetitors = PlayoffTable[as.character(baseball$Year)] 
+baseball$NumCompetitors = PlayoffTable[as.character(baseball$Year)]
 nrow(baseball[baseball$NumCompetitors==8,])
 baseball$WorldSeries = as.numeric(baseball$RankPlayoffs == 1)
 nrow(baseball[baseball$WorldSeries==0,])
@@ -522,7 +522,7 @@ colnames(case1)<-colnames(parole)
 case1$state<-as.factor(case1$state)
 case1$crime<-as.factor(case1$crime)
 predict(modelViolate,newdata=case1,type="response")
-predictVio<-predict(modelViolate,newdata=test,type="response")  
+predictVio<-predict(modelViolate,newdata=test,type="response")
 summary(predictVio)
 sort(table(predictVio))
 
@@ -607,12 +607,12 @@ ROCRperf<-performance(ROCRpredict, "tpr","fpr")
 auc = as.numeric(performance(ROCRpredict, "auc")@y.values)
 ######
 
-"To compute interest revenue, 
+"To compute interest revenue,
 consider a $c investment in a loan that has an annual interest rate r over a period
-of t years. Using continuous compounding of interest, this investment pays back c * exp(rt) 
-dollars by the end of the t years, where exp(rt) is e raised to the r*t power."  
+of t years. Using continuous compounding of interest, this investment pays back c * exp(rt)
+dollars by the end of the t years, where exp(rt) is e raised to the r*t power."
 c=10
-r = .06 
+r = .06
 t = 3
 c * exp(r*t)
 
