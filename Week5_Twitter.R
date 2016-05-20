@@ -8,6 +8,13 @@ dater<-getwd()
 setwd(paste0(dater, "/MitAnal"))
 dir()
 # VIDEO 5
+# Install new packages
+
+install.packages("tm")
+library(tm)
+install.packages("SnowballC")
+library(SnowballC)
+
 
 # Read in the data
 
@@ -24,12 +31,6 @@ tweets$Negative = as.factor(tweets$Avg <= -1)
 table(tweets$Negative)
 
 
-# Install new packages
-
-install.packages("tm")
-library(tm)
-install.packages("SnowballC")
-library(SnowballC)
 
 
 # Create corpus
@@ -39,20 +40,22 @@ corpus = Corpus(VectorSource(tweets$Tweet))
 # Look at corpus
 corpus
 
-corpus[[1]]
+as.character(corpus[[1]])
+
 
 
 # Convert to lower-case
 
 corpus = tm_map(corpus, tolower)
+corpus = tm_map(corpus, PlainTextDocument)
 
-corpus[[1]]
+as.character(corpus[[1]])
 
 # Remove punctuation
 
 corpus = tm_map(corpus, removePunctuation)
 
-corpus[[1]]
+as.character(corpus[[1]])
 
 # Look at stop words 
 stopwords("english")[1:10]
@@ -61,13 +64,13 @@ stopwords("english")[1:10]
 
 corpus = tm_map(corpus, removeWords, c("apple", stopwords("english")))
 
-corpus[[1]]
+as.character(corpus[[1]])
 
 # Stem document 
 
 corpus = tm_map(corpus, stemDocument)
 
-corpus[[1]]
+as.character(corpus[[1]])
 
 
 
