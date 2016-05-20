@@ -13,13 +13,13 @@ wiki$Vandal = as.factor(wiki$Vandal)
 
 
 ##load libraries:
-#install.packages("flexclust")
+install.packages("flexclust")
 #install.packages("ggplot2")
-#install.packages("maps")
-#install.packages("ggmap")
-#install.packages("igraph")
-#install.packages("wordcloud")
-#install.packages("RColorBrewer")
+install.packages("maps")
+install.packages("ggmap")
+install.packages("igraph")
+install.packages("wordcloud")
+install.packages("RColorBrewer")
 
 library(tm)
 library(SnowballC)
