@@ -39,7 +39,7 @@ table(wiki$Vandal)
 
   corpusAdded = Corpus(VectorSource(wiki$Added))
 
-corpusAdded[[1]]
+as.character(corpusAdded[[1]])
 
 
 # Pre-process data
@@ -51,11 +51,12 @@ corpusAdded <- tm_map(corpusAdded, removeWords, stopwords("english"))
 
 corpusAdded <- tm_map(corpusAdded, stemDocument)
 
-# Look at first 
-corpusAdded[[1]]
+# Look at first
+as.character(corpusAdded[[1]])
 
 dtmAdded<-DocumentTermMatrix(corpusAdded)
-dtmAdded
+(dtmAdded$Terms)
+
 
 sparseAdded<-removeSparseTerms(dtmAdded, 0.997)
 
@@ -77,7 +78,7 @@ corpusRemoved <- tm_map(corpusRemoved, removeWords, stopwords("english"))
 
 corpusRemoved <- tm_map(corpusRemoved, stemDocument)
 
-# Look at first 
+# Look at first
 corpusRemoved[[3]]
 
 dtmRemoved<-DocumentTermMatrix(corpusRemoved)
@@ -180,9 +181,11 @@ table(wikiTest3$Vandal,prediction4)
 
 ###neww set
 
-trials<-read.csv("data/clinical_trial.csv",stringsAsFactors=FALSE)
+trials<-read.csv("data/clinical_trial.csv",stringsAsFactors=FALSE,fileEncoding="latin1")
 str(trials)
 nchar(trials[which.max(nchar(trials[,2])),2])
+max(nchar(trials$abstract))
+trials[which.max(nchar(trials$abstract)),]
 
 table(nchar(trials[,2])<1)
 trials[which.min(nchar(trials[,1])),1]
@@ -197,6 +200,7 @@ corpusTitle[[1]]
 
 # Pre-process data
 corpusTitle <- tm_map(corpusTitle, tolower)
+corpusTitle = tm_map(corpusTitle, PlainTextDocument)
 
 corpusTitle <- tm_map(corpusTitle, removePunctuation)
 
@@ -229,6 +233,7 @@ corpusAbstract[[1]]
 
 # Pre-process data
 corpusAbstract <- tm_map(corpusAbstract, tolower)
+corpusAbstract = tm_map(corpusAbstract, PlainTextDocument)
 
 corpusAbstract <- tm_map(corpusAbstract, removePunctuation)
 
@@ -251,14 +256,14 @@ dtmAbstract = as.data.frame(as.matrix(dtmAbstract))###
 str(dtmAbstract)
 
 which.max(apply(dtmAbstract,2,sum))
-  
+
 #the following is in preparation of merging the two df.
 colnames(dtmTitle) = paste0("T", colnames(dtmTitle))
 colnames(dtmAbstract) = paste0("A", colnames(dtmAbstract))
 
 dtm<-cbind(dtmTitle,dtmAbstract)
 dtm$trial<-trials$trial
-summary(dtm)
+str(dtm)
 
 
 ##build the model
@@ -280,13 +285,28 @@ head(cartPrediction)
 
 summary(cartPrediction)
 
-table(train$trial,cartPrediction>=.5)
-(631+441)/nrow(train)
+tbl<-table(train$trial,cartPrediction>=.5)
+print('accuracy');(tbl[1]+tbl[4])/nrow(train) #accuracy
+print('sensitivity');(tbl[4])/(tbl[2]+tbl[4]) #sensitivity
+print('specificity');(tbl[1])/(tbl[1]+tbl[3]) #specificity
+print('false pos rate');1-(tbl[1])/(tbl[1]+tbl[3]) #False positive rate
 
-#sensitivity 
-#sensitivity is TP over that row 
+library(ROCR)
+predROCR = prediction(predTest, test$trial)   # must use no type = 'class' predict
+
+perfROCR = performance(predROCR, "tpr", "fpr")
+
+plot(perfROCR, colorize=TRUE,print.cutoffs.at=seq(0,1,.1),text.adj=c(-.2,1.7))
+abline(h=(tbl[4])/(tbl[2]+tbl[4]),col=3)
+abline(v=1-(tbl[1])/(tbl[1]+tbl[3]),col=3)
+
+
+(631+441)/nrow(train) #accurafor threshold =.5
+
+#sensitivity
+#sensitivity is TP over that row
 441/(131+441)
-# specificity is TN over that row 
+# specificity is TN over that row
 631/(631+99)
 
 
@@ -295,12 +315,14 @@ table(train$trial,cartPrediction>=.5)
 trialCART<-rpart(trial~.,data=train,method="class")
 prp(trialCART)
 
-predTest<-predict(trialCART,newdata=test)[,2]  #this might need a class type
+predTest<-predict(trialCART,newdata=test)[,2]  #this doesn't need a 'class' type
+predTest<-predict(trialCART,newdata=test,type='class')  #this needs a 'class' type
 head(predTest)
 
-#FN are a problem because they won't be caught by an expert reviewer, 
+#FN are a problem because they won't be caught by an expert reviewer,
 #so we try to reduce them by reducing the threshold
-table(test$trial,predTest>=.5)
+table(test$trial,predTest>=.5) #if using 2nd column and no type = 'class'
+table(test$trial,predTest) # if type = 'class'
 table(test$trial)
 table(predTest>=.5)
 apply(table(test$trial,predTest>=.5),2,sum)
@@ -309,11 +331,11 @@ apply(table(test$trial,predTest>=.5),2,sum)
 
 #ROC calc
 library(ROCR)
-predROCR = prediction(predTest, test$trial)
+predROCR = prediction(predTest, test$trial)   # must use no type = 'class' predict
 
 perfROCR = performance(predROCR, "tpr", "fpr")
 
-plot(perfROCR, colorize=TRUE)
+plot(perfROCR, colorize=TRUE,print.cutoffs.at=seq(0,1,.1),text.adj=c(-.2,1.7))
 
 # Compute AUC
 
@@ -336,12 +358,12 @@ which.min(nchar(emails[,1]))
 
 corpus = Corpus(VectorSource(emails$text))
 
-corpus[[1]]
+corpus[[1]]$content
 
 
 # Pre-process data
 corpus <- tm_map(corpus, tolower)
-
+corpus = tm_map(corpus, PlainTextDocument)
 corpus <- tm_map(corpus, removePunctuation)
 
 corpus <- tm_map(corpus, removeWords, stopwords("english"))
@@ -349,7 +371,7 @@ corpus <- tm_map(corpus, removeWords, stopwords("english"))
 corpus <- tm_map(corpus, stemDocument)
 
 # Look at first email
-corpus[[1]]
+corpus[[1]]$content
 
 # Create matrix
 
@@ -381,12 +403,12 @@ spl = sample.split(emailsSparse$spam, 0.7)
 train = subset(emailsSparse, spl == TRUE)
 test = subset(emailsSparse, spl == FALSE)
 str(train)
-#For each model, obtain the predicted spam probabilities for the training set. 
-#Be careful to obtain probabilities instead of predicted classes, because we will be 
-#using these values to compute training set AUC values. Recall that you can obtain 
-#probabilities for CART models by not passing any type parameter to the predict() function, 
-#and you can obtain probabilities from a random forest by adding the argument type="prob". 
-#For CART and random forest, you need to select the second column of the output 
+#For each model, obtain the predicted spam probabilities for the training set.
+#Be careful to obtain probabilities instead of predicted classes, because we will be
+#using these values to compute training set AUC values. Recall that you can obtain
+#probabilities for CART models by not passing any type parameter to the predict() function,
+#and you can obtain probabilities from a random forest by adding the argument type="prob".
+#For CART and random forest, you need to select the second column of the output
 #of the predict() function, corresponding to the probability of a message being spam.
 
 #Log
