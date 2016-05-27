@@ -10,7 +10,7 @@ dir()
 
 wiki<-read.csv("data/wiki.csv",stringsAsFactors=FALSE)
 wiki$Vandal = as.factor(wiki$Vandal)
-
+str(wiki)
 
 ##load libraries:
 install.packages("flexclust")
