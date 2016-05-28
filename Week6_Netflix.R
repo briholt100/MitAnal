@@ -38,7 +38,7 @@ distances = dist(movies[2:20], method = "euclidean")
 install.packages("ROAuth")
 library(ROAuth)
 # Hierarchical clustering
-clusterMovies = hclust(distances, method = "ward") 
+clusterMovies = hclust(distances, method = "ward")
 
 # Plot the dendrogram
 plot(clusterMovies)
@@ -48,7 +48,7 @@ clusterGroups = cutree(clusterMovies, k = 10)
 
 #Now let's figure out what the clusters are like.
 
-# Let's use the tapply function to compute the percentage 
+# Let's use the tapply function to compute the percentage
 #of movies in each genre and cluster
 
 tapply(movies$Action, clusterGroups, mean)
@@ -98,8 +98,8 @@ spl[[1]]
 #is the same as
 subset(movies[2:20], clusterGroups == 1)
 
-#so colMeans(spl[[1]]) will output the centroid of cluster 1. 
-#But an even easier approach uses the lapply function. 
+#so colMeans(spl[[1]]) will output the centroid of cluster 1.
+#But an even easier approach uses the lapply function.
 #The following command will output the cluster centroids for all clusters:
-  
+
   lapply(spl, colMeans)
