@@ -57,7 +57,7 @@ k = 7
 
 # Run k-means
 set.seed(1000)
-KMC = kmeans(kos[,-1], centers = k, 
+KMC = kmeans(kos[,-1], centers = k,
              #iter.max = 1000
              )
 str(KMC)
@@ -89,7 +89,7 @@ str(airlines)
 summary(airlines)
 install.packages("caret")
 library(caret)
-preproc = preProcess(airlines)
+preproc = preProcess(airlines)  #normalizes the data
 airlinesNorm = predict(preproc, airlines)
 summary(airlinesNorm)
 
@@ -175,9 +175,9 @@ RMSE<-sqrt(SSE/(nrow(test)))
 ###alternative: rmse.lm = sqrt(mean((lmPred - test$reimbursement2009)^2))
 
 
-SSE=sum((test$reimbursement2009 - lmPred)^2) 
+SSE=sum((test$reimbursement2009 - lmPred)^2)
 SST =sum((test$reimbursement2009 - mean(claims$reimbursement2009))^2)  #the mean comes from the baseline model
-1-SSE/SST  # this is R^2 
+1-SSE/SST  # this is R^2
 
 baseline.pred = mean(train$reimbursement2009)
 sqrt(mean((baseline.pred - test$reimbursement2009)^2))
