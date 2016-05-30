@@ -276,3 +276,133 @@ all.predictions = c(pred.test1, pred.test2, pred.test3)
 all.outcomes = c(test1$reimbursement2009, test2$reimbursement2009, test3$reimbursement2009)
 
 rmse.all = sqrt(mean((all.predictions - all.outcomes)^2))
+
+
+
+
+####new problem 2016
+
+
+stocks<-read.csv("/home/brian/Projects/MitAnal/data/StocksCluster.csv")
+str(stocks)
+summary(stocks)
+head(stocks)
+tail(stocks)
+
+"""For the first 11 variables, the value stored is a proportional change in
+  stock value during that month. For instance, a value of 0.05 means the stock
+  increased in value 5% during the month, while a value of -0.02 means the
+  stock decreased in value 2% during the month."""
+
+table(stocks$PositiveDec)
+cor(stocks[,1:11])    #...0.19167279
+colMeans(stocks)
+
+#logistic
+library(caTools)
+set.seed(144)
+spl = sample.split(stocks$PositiveDec, SplitRatio = 0.7)
+stocksTrain = subset(stocks, spl == TRUE)
+stocksTest = subset(stocks, spl == FALSE)
+
+StocksModel<-glm(PositiveDec~.,data=stocksTrain,family=binomial)
+summary(StocksModel)
+
+predLog1<-predict(StocksModel,newdata=stocksTrain,type='response')
+tbl<-table(stocksTrain$PositiveDec,predLog1>.5)
+tbl
+(tbl[1]+tbl[4])/sum(tbl)
+
+#test set log predictinos
+
+predTestLog1<-predict(StocksModel,newdata=stocksTest,type='response')
+tbl<-table(stocksTest$PositiveDec,predTestLog1>.5)
+tbl
+(tbl[1]+tbl[4])/sum(tbl)
+
+#test set baseline predicting most common score
+table(stocksTest$PositiveDec)
+1897/(1577+1897)
+
+#make new data set without d.v.
+
+limitedTrain = stocksTrain
+limitedTrain$PositiveDec = NULL
+
+limitedTest = stocksTest
+limitedTest$PositiveDec = NULL
+
+#standardizing data (score - mean/ SD)
+library(caret)
+preproc = preProcess(limitedTrain)
+normTrain = predict(preproc, limitedTrain)
+normTest = predict(preproc, limitedTest)
+colMeans(normTrain)
+colMeans(normTest)
+
+par(mfrow=c(1,2))
+hist(stocksTrain[,1])
+hist(stocksTest[,1])
+
+
+# Run k-means
+k =3
+set.seed(144)
+KM = kmeans(normTrain, centers = k)
+str(KM)
+library(flexclust)
+
+km.kcca = as.kcca(KM, normTrain)
+clusterTrain = predict(km.kcca)
+clusterTest = predict(km.kcca, newdata=normTest)
+table(clusterTest)
+
+stocksTrain1<-subset(stocksTrain,clusterTrain==1)
+stocksTrain2<-subset(stocksTrain,clusterTrain==2)
+stocksTrain3<-subset(stocksTrain,clusterTrain==3)
+
+stocksTest1<-subset(stocksTest,clusterTest==1)
+stocksTest2<-subset(stocksTest,clusterTest==2)
+stocksTest3<-subset(stocksTest,clusterTest==3)
+
+mean(stocksTrain1$PositiveDec)
+mean(stocksTrain2$PositiveDec)
+mean(stocksTrain3$PositiveDec)
+
+
+StocksModel1<-glm(PositiveDec~.,family=binomial,data=stocksTrain1)
+StocksModel2<-glm(PositiveDec~.,family=binomial,data=stocksTrain2)
+StocksModel3<-glm(PositiveDec~.,family=binomial,data=stocksTrain3)
+
+summary(StocksModel1)
+summary(StocksModel2)
+summary(StocksModel3)
+
+StocksModel1$coefficients
+StocksModel2$coefficients
+StocksModel3$coefficients
+
+rbind(StocksModel1$coefficients>0,StocksModel2$coefficients>0,StocksModel3$coefficients>0)## this makes a grid showing each variable's sign on each cluster
+
+
+PredictTest1<-predict(StocksModel1,newdata=stocksTest1,type='response')
+PredictTest2<-predict(StocksModel2,newdata=stocksTest2,type='response')
+PredictTest3<-predict(StocksModel3,newdata=stocksTest3,type='response')
+
+tbl<-table(stocksTest1$PositiveDec,PredictTest1>.5)
+tbl<-table(stocksTest2$PositiveDec,PredictTest2>.5)
+tbl<-table(stocksTest3$PositiveDec,PredictTest3>.5)
+tbl
+(tbl[1]+tbl[4])/sum(tbl)
+
+#combining predictions
+
+AllPredictions = c(PredictTest1, PredictTest2, PredictTest3)
+
+AllOutcomes = c(stocksTest1$PositiveDec, stocksTest2$PositiveDec, stocksTest3$PositiveDec)
+
+tbl<-table(AllOutcomes,AllPredictions>.5)
+tbl
+(tbl[1]+tbl[4])/sum(tbl)
+
+
