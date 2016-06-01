@@ -1,3 +1,8 @@
+library(ggplot2)
+library(maps)
+library(ggmap)
+
+
 getwd()
 school<-"I:/My Data Sources/mooc/MitAnalytic"
 setwd(school)
