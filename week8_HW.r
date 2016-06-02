@@ -41,9 +41,14 @@ predictionMap = merge(statesMap, predictionDataFrame, by = "region")
 predictionMap = predictionMap[order(predictionMap$order),]
 dim(statesMap)
 
-ggplot(predictionMap, aes(x = long, y = lat, group = group, fill = TestPredictionBinary)) + geom_polygon(color = "black")
+ggplot(predictionMap, aes(x = long, y = lat, group = group, fill = TestPredictionBinary)) + 
+  geom_polygon(color = "black")
 
-ggplot(predictionMap, aes(x = long, y = lat, group = group, fill = TestPrediction))+ geom_polygon(color = "black",linetype=3,size=3) + scale_fill_gradient(low = "blue", high = "red", guide = "legend", breaks= c(0,1), labels = c("Democrat", "Republican"), name = "Prediction 2012")
+ggplot(predictionMap, aes(x = long, y = lat, group = group, fill = TestPrediction))+
+  geom_polygon(color = "black",linetype=1,size=1,alpha=0.3) + 
+  scale_fill_gradient(low = "blue", high = "red", guide = "legend", breaks= c(0,1), 
+                      labels = c("Democrat", "Republican"), name = "Prediction 2012")
+
 predictionMap[predictionMap$Test.State=="Iowa",]
 str(predictionMap)
 
@@ -80,8 +85,9 @@ edges<-read.csv("./data/edges.csv")
 str(edges)
 users<-read.csv("./data/users.csv")
 str(users)
+edges<-lapply(edges,as.factor)
 
-table(edges$V2))
+(table(edges$V1))
 table(users$school,users$gender)
 
 install.packages("igraph")
