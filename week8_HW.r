@@ -90,7 +90,7 @@ edges<-lapply(edges,as.factor)
 (table(edges$V1))
 table(users$school,users$gender)
 
-install.packages("igraph")
+#install.packages("igraph")
 library(igraph)
 
 g = graph.data.frame(edges, FALSE, users)
@@ -100,7 +100,7 @@ plot(g, vertex.size=5, vertex.label=NA)
 table(degree(g)>9)
 V(g)$size = degree(g)/2+2
 plot(g, vertex.label=NA)
-  degree(g)
+  sort(degree(g))
 
 V(g)$color = "black"
 V(g)$color[V(g)$gender == "A"] = "red"
@@ -108,7 +108,7 @@ V(g)$color[V(g)$gender == "B"] = "gray"
 
 V(g)$color = "black"
 V(g)$color[V(g)$school == "A"] = "red"
-V(g)$color[V(g)$school == "AB"] = "gray"
+V(g)$color[V(g)$school == "AB"] = "green"
 
 plot(g, vertex.label=NA)
 
@@ -122,5 +122,7 @@ plot(g, vertex.label=NA)
 
 
 s
-tweets<-read.csv("./data/tweets.csv")
+tweets<-read.csv("./data/tweets.csv",stringsAsFactors=F)
 str(tweets)
+
+
