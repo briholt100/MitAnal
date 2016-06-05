@@ -34,15 +34,11 @@ table(tweets$Negative)
 
 
 # Create corpus
- 
+
 corpus = Corpus(VectorSource(tweets$Tweet))
 
 # Look at corpus
 corpus
-
-as.character(corpus[[1]])
-
-
 
 # Convert to lower-case
 
@@ -57,7 +53,7 @@ corpus = tm_map(corpus, removePunctuation)
 
 as.character(corpus[[1]])
 
-# Look at stop words 
+# Look at stop words
 stopwords("english")[1:10]
 
 # Remove stopwords and apple
@@ -66,7 +62,7 @@ corpus = tm_map(corpus, removeWords, c("apple", stopwords("english")))
 
 as.character(corpus[[1]])
 
-# Stem document 
+# Stem document
 
 corpus = tm_map(corpus, stemDocument)
 
@@ -82,7 +78,7 @@ frequencies = DocumentTermMatrix(corpus)
 
 frequencies
 
-# Look at matrix 
+# Look at matrix
 
 inspect(frequencies[1000:1005,505:515])
 
@@ -145,7 +141,7 @@ table(testSparse$Negative, predictCART)
 
 (294+18)/(294+6+37+18)
 
-# Baseline accuracy 
+# Baseline accuracy
 
 table(testSparse$Negative)
 
